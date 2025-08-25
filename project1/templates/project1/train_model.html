@@ -1,0 +1,35 @@
+<!--
+<h2>Train a Machine Learning Model</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Train">
+</form>
+
+{% if error %}
+    <p style="color: red;">Error: {{ error }}</p>
+{% endif %}
+
+{% if report %}
+    <h3>Classification Report</h3>
+    <table border="1">
+        <tr>
+            <th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th>
+        </tr>
+        {% for label, metrics in report.items %}
+            {% if metrics.precision %}
+            <tr>
+                <td>{{ label }}</td>
+                <td>{{ metrics.precision|floatformat:2 }}</td>
+                <td>{{ metrics.recall|floatformat:2 }}</td>
+                
+                <td>{{ metrics.f1_score|floatformat:2 }}</td>
+
+
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+{% endif %}
+-->

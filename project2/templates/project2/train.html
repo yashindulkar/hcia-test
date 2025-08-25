@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="box">
+  <div class="title-container">
+    <div class="title">Project 2: Train Your Classifier</div>
+  </div>
+
+  <div class="main-text">
+    <p>
+      This application uses a text classification pipeline built from a user-selected vectorizer (TF-IDF or Bag-of-Words) 
+      and classifier (Logistic Regression, SVM, or Random Forest). Hyperparameter tuning is done with GridSearchCV 
+      when applicable.
+    </p>
+  </div>
+
+  <div class="main-text">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" name="action" value="train">Train Model</button>
+      <button type="submit" name="action" value="load">Load Pretrained Model</button>
+    </form>
+
+    <div id="spinner" style="display: none; margin-top: 1rem;">
+      <p>Training in progress... Please wait.</p>
+      <img src="{% static 'spinner.gif' %}" alt="Loading..." width="50">
+    </div>
+
+    {% if error %}
+      <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if result %}
+      <h3>Test Accuracy: {{ result }}</h3>
+    {% endif %}
+
+    <div style="margin-top: 2rem;">
+      <p><strong>Want to try Active Learning?</strong></p>
+      <a href="{% url 'project2:active_learning' %}" style="text-decoration: none;">
+        <button type="button">Go to Active Learning</button>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.querySelector('form');
+  const spinner = document.getElementById('spinner');
+
+  form.addEventListener('submit', function () {
+    spinner.style.display = 'block';
+  });
+</script>
+{% endblock %}

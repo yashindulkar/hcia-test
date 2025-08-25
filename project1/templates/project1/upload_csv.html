@@ -1,0 +1,519 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <style>
+    /* 1) Make sure html/body aren't blocking scrolling: */
+    html, body {
+      height: auto !important;
+      overflow-y: auto !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 2) Let your main ".box" grow beyond the viewport and scroll if needed: */
+    .box {
+      max-height: 100vh;       /* never taller than the viewport */
+      overflow-y: auto;        /* show a scrollbar when it's too tall */
+      padding: 20px;
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+    
+    /* Form styling */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .form-group input[type="number"],
+    .form-group input[type="text"],
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      max-width: 300px;
+    }
+    
+    .form-text {
+      font-size: 0.85em;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+    
+    /* Button styling */
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    
+    /* Results table styling */
+    #model-result table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    #model-result th,
+    #model-result td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    
+    #model-result th {
+      background-color: #f2f2f2;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="title-container" style="margin-top: 20px;">
+        <div class="title">Upload and Visualize CSV</div>
+    </div>
+
+    <div class="main-text">
+        {% if csv_data %}
+        <p class="centered-text">
+            Upload another CSV file to visualize different data. The CSV should be structured with the first row 
+            containing feature names, and the last column containing the output values.
+        </p>
+        {% else %}
+        <p class="centered-text">
+            Upload a CSV file to visualize the data. The CSV should be structured with the first row 
+            containing feature names, and the last column containing the output values.
+        </p>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Upload and Visualize</button>
+        </form>
+        
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        
+        {% if csv_data %}
+            <h3>CSV Data Preview of "{{ filename }}"</h3>
+            <p><em>Showing all {{ row_count }} rows</em></p>
+            
+            <div style="max-height: 300px; overflow-y: auto; overflow-x: auto; margin-bottom: 20px; border: 1px solid #ddd;">
+                <table border="1" style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background-color: #f9f9f9;">
+                        <tr>
+                            {% for column in headers %}
+                                <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Interactive Visualization Section -->
+            <div style="margin-top: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
+                <h3>Interactive Visualization</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label><input type="radio" name="analysis-type" value="classification" checked> Classification</label>
+                </div>
+                
+                <div id="feature-selection" style="margin-bottom: 20px;">
+                    <p><strong>Select features to plot:</strong></p>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div>
+                            <label for="x-feature">X-axis feature:</label>
+                            <select id="x-feature" class="feature-select">
+                                {% for feature in features %}
+                                    <option value="{{ forloop.counter0 }}">{{ feature }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="y-feature">Y-axis feature:</label>
+                            <select id="y-feature" class="feature-select">
+                                {% for feature in features %}
+                                    {% if forloop.counter0 == 1 %}
+                                        <option value="{{ forloop.counter0 }}" selected>{{ feature }}</option>
+                                    {% else %}
+                                        <option value="{{ forloop.counter0 }}">{{ feature }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="width: 100%; height: 400px;">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+            </div>
+
+
+            <!-- Model training -->
+            <div style="margin-top: 40px; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
+                <h3>Train a Machine Learning Model</h3>
+                <form id="train-model-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_model_type">{{ train_form.model_type.label }}:</label>
+                        {{ train_form.model_type }}
+                        <small class="form-text text-muted">Select the machine learning algorithm to use</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_test_size">{{ train_form.test_size.label }}:</label>
+                        {{ train_form.test_size }}
+                        <small class="form-text text-muted">Proportion of the dataset to include in the test split</small>
+                    </div>
+                    
+                    <!-- Random Forest Parameters -->
+                    <div id="rf-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>Random Forest Parameters</h4>
+                        
+                        <div class="form-group">
+                            <label for="id_rf_n_estimators">{{ train_form.rf_n_estimators.label }}:</label>
+                            {{ train_form.rf_n_estimators }}
+                            <small class="form-text text-muted">{{ train_form.rf_n_estimators.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_rf_max_depth">{{ train_form.rf_max_depth.label }}:</label>
+                            {{ train_form.rf_max_depth }}
+                            <small class="form-text text-muted">{{ train_form.rf_max_depth.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_rf_max_features">{{ train_form.rf_max_features.label }}:</label>
+                            {{ train_form.rf_max_features }}
+                            <small class="form-text text-muted">{{ train_form.rf_max_features.help_text }}</small>
+                        </div>
+                    </div>
+                    
+                    <!-- SVM Parameters -->
+                    <div id="svm-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>Support Vector Machine Parameters</h4>
+                        
+                        <div class="form-group">
+                            <label for="id_svm_kernel">{{ train_form.svm_kernel.label }}:</label>
+                            {{ train_form.svm_kernel }}
+                            <small class="form-text text-muted">{{ train_form.svm_kernel.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_svm_C">{{ train_form.svm_C.label }}:</label>
+                            {{ train_form.svm_C }}
+                            <small class="form-text text-muted">{{ train_form.svm_C.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_svm_gamma">{{ train_form.svm_gamma.label }}:</label>
+                            {{ train_form.svm_gamma }}
+                            <small class="form-text text-muted">{{ train_form.svm_gamma.help_text }}</small>
+                        </div>
+                    </div>
+                    
+                    <!-- XGBoost Parameters -->
+                    <div id="xgb-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>XGBoost Parameters</h4>
+                        
+                        <div class="form-group">
+                            <label for="id_xgb_n_estimators">{{ train_form.xgb_n_estimators.label }}:</label>
+                            {{ train_form.xgb_n_estimators }}
+                            <small class="form-text text-muted">{{ train_form.xgb_n_estimators.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_xgb_learning_rate">{{ train_form.xgb_learning_rate.label }}:</label>
+                            {{ train_form.xgb_learning_rate }}
+                            <small class="form-text text-muted">{{ train_form.xgb_learning_rate.help_text }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_xgb_max_depth">{{ train_form.xgb_max_depth.label }}:</label>
+                            {{ train_form.xgb_max_depth }}
+                            <small class="form-text text-muted">{{ train_form.xgb_max_depth.help_text }}</small>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" style="margin-top: 20px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Train Model</button>
+                </form>
+                
+                <div id="model-result" style="margin-top: 20px;"></div>
+            </div>
+            
+            
+            
+            
+        {% endif %}
+        
+        {% if plots %}
+            <h3>Data Visualization</h3>
+            <div class="visualization-container">
+                {% for plot in plots %}
+                    <img src="data:image/png;base64,{{ plot }}" alt="Data Visualization" style="max-width: 100%; margin-bottom: 20px;">
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% if csv_data %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // JSON data from backend
+    const features = {{ features_json|safe }};
+    const dataPoints = {{ data_json|safe }};
+    const targetClasses = {{ target_classes|safe }};
+    const uniqueClasses = {{ unique_classes|safe }};
+    const colorPalette = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)',
+        'rgba(199, 199, 199, 0.7)',
+        'rgba(83, 102, 255, 0.7)',
+        'rgba(40, 159, 64, 0.7)',
+        'rgba(210, 199, 199, 0.7)'
+    ];
+    
+    let chart;
+    
+    function createChart(xFeatureIndex, yFeatureIndex) {
+        const ctx = document.getElementById('scatterChart').getContext('2d');
+        
+        // Group data by class
+        const datasets = [];
+        
+        for (let i = 0; i < uniqueClasses.length; i++) {
+            const classValue = uniqueClasses[i];
+            const points = [];
+            
+            for (let j = 0; j < dataPoints.length; j++) {
+                if (targetClasses[j] === classValue) {
+                    points.push({
+                        x: dataPoints[j][xFeatureIndex],
+                        y: dataPoints[j][yFeatureIndex]
+                    });
+                }
+            }
+            
+            datasets.push({
+                label: `Class ${classValue}`,
+                data: points,
+                backgroundColor: colorPalette[i % colorPalette.length],
+                borderColor: colorPalette[i % colorPalette.length].replace('0.7', '1'),
+                borderWidth: 1,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        }
+        
+        // Destroy previous chart if it exists
+        if (chart) {
+            chart.destroy();
+        }
+        
+        // Create new chart
+        chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: features[xFeatureIndex]
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: features[yFeatureIndex]
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Classification Visualization',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: (${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Event listeners for feature selection
+    document.getElementById('x-feature').addEventListener('change', updateChart);
+    document.getElementById('y-feature').addEventListener('change', updateChart);
+    
+    function updateChart() {
+        const xFeatureIndex = parseInt(document.getElementById('x-feature').value);
+        const yFeatureIndex = parseInt(document.getElementById('y-feature').value);
+        createChart(xFeatureIndex, yFeatureIndex);
+    }
+    
+    // Initialize chart with default features
+    document.addEventListener('DOMContentLoaded', function() {
+        updateChart();
+        
+        // Set up model parameter visibility toggling
+        const modelTypeSelect = document.getElementById('id_model_type');
+        const paramSections = document.querySelectorAll('.model-params');
+        
+        // Initial state based on selected model
+        updateModelParams();
+        
+        // Change event to update visibility
+        modelTypeSelect.addEventListener('change', updateModelParams);
+        
+        function updateModelParams() {
+            // Hide all parameter sections first
+            paramSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show the relevant section based on selection
+            const selectedModel = modelTypeSelect.value;
+            if (selectedModel === 'rf') {
+                document.getElementById('rf-params').style.display = 'block';
+            } else if (selectedModel === 'svm') {
+                document.getElementById('svm-params').style.display = 'block';
+            } else if (selectedModel === 'xgb') {
+                document.getElementById('xgb-params').style.display = 'block';
+            }
+        }
+    });
+
+
+    //asynchronous call for updating training metrics without loading the page
+    document.getElementById('train-model-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // prevent full page reload
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const resultContainer = document.getElementById('model-result');
+    
+    // Show loading indicator
+    resultContainer.innerHTML = '<p>Training model, please wait...</p>';
+    
+    // Add relevant model parameters to formData based on selected model
+    const modelType = document.getElementById('id_model_type').value;
+    
+    if (modelType === 'rf') {
+        // Add Random Forest specific parameters
+        formData.append('rf_n_estimators', document.getElementById('id_rf_n_estimators').value);
+        formData.append('rf_max_depth', document.getElementById('id_rf_max_depth').value);
+        formData.append('rf_max_features', document.getElementById('id_rf_max_features').value);
+    } 
+    else if (modelType === 'svm') {
+        // Add SVM specific parameters
+        formData.append('svm_kernel', document.getElementById('id_svm_kernel').value);
+        formData.append('svm_C', document.getElementById('id_svm_C').value);
+        formData.append('svm_gamma', document.getElementById('id_svm_gamma').value);
+    }
+    else if (modelType === 'xgb') {
+        // Add XGBoost specific parameters
+        formData.append('xgb_n_estimators', document.getElementById('id_xgb_n_estimators').value);
+        formData.append('xgb_learning_rate', document.getElementById('id_xgb_learning_rate').value);
+        formData.append('xgb_max_depth', document.getElementById('id_xgb_max_depth').value);
+    }
+
+    fetch("{% url 'project1:train_model_ajax' %}", {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            resultContainer.innerHTML = `<p style="color:red;">${data.error}</p>`;
+            return;
+        }
+
+        let html = `
+        <div style="margin-top: 20px; padding: 15px; background-color: #e9f7ef; border-radius: 5px; border-left: 5px solid #28a745;">
+            <h4 style="margin-top: 0;">Model Performance Report</h4>
+            <table border="1" style="margin-top:10px; width: 100%; border-collapse: collapse;">
+                <thead style="background-color: #f2f2f2;">
+                    <tr>
+                        <th style="padding: 8px; text-align: left;">Label</th>
+                        <th style="padding: 8px; text-align: center;">Precision</th>
+                        <th style="padding: 8px; text-align: center;">Recall</th>
+                        <th style="padding: 8px; text-align: center;">F1 Score</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        
+        for (let label in data.report) {
+            let metrics = data.report[label];
+            html += `<tr>
+                <td style="padding: 8px; text-align: left;">${label}</td>
+                <td style="padding: 8px; text-align: center;">${metrics.precision}</td>
+                <td style="padding: 8px; text-align: center;">${metrics.recall}</td>
+                <td style="padding: 8px; text-align: center;">${metrics.f1_score}</td>
+            </tr>`;
+        }
+        
+        html += `</tbody></table>
+        </div>`;
+        
+        resultContainer.innerHTML = html;
+    })
+    .catch(err => {
+        resultContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    });
+});
+</script>
+{% endif %}
+{% endblock script %} 

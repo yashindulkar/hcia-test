@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Project 4 Landing Page - Fixed Button Display -->
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <!-- Header Section -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 32px; color: #333; margin-bottom: 10px; font-weight: bold;">
+            Project 4: Recommender System Cold-Start Study
+        </h1>
+        <p style="font-size: 18px; color: #666; margin: 0; font-style: italic;">
+            Influence of Future Predictions over Active Learning of Users' Tastes
+        </p>
+    </div>
+
+    <!-- Study Overview Card -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2 style="margin: 0 0 15px 0; font-size: 24px;">🎯 Study Overview</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6;">
+            Explore how showing users the impact of their responses affects the learning process in recommendation systems. 
+            Our innovative approach provides visual feedback about how your movie ratings will influence future recommendations.
+        </p>
+    </div>
+
+    <!-- Information Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px;">
+        <div style="background: #f8f9ff; padding: 25px; border-radius: 8px; border-left: 4px solid #4f7ecb;">
+            <h3 style="margin: 0 0 15px 0; color: #4f7ecb; font-size: 20px;">📋 What You'll Do</h3>
+            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                <li>Select movies from our database</li>
+                <li>See how different ratings affect recommendations</li>
+                <li>Provide feedback on the experience</li>
+                <li>Help advance recommendation research</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff8f0; padding: 25px; border-radius: 8px; border-left: 4px solid #ff9500;">
+            <h3 style="margin: 0 0 15px 0; color: #ff9500; font-size: 20px;">⏱️ Time Required</h3>
+            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                <li><strong>Study participation:</strong> 10-15 minutes</li>
+                <li><strong>Movie selection:</strong> 2-3 minutes</li>
+                <li><strong>Feedback:</strong> 2-5 minutes</li>
+                <li><strong>Total:</strong> ~15-20 minutes</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Action Buttons Section - FIXED VERSION -->
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center;">
+        <h3 style="margin: 0 0 25px 0; color: #333; font-size: 24px;">Ready to Participate?</h3>
+        
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; align-items: center;">
+            <!-- Download PDF Button - FIXED -->
+            <a href="{% url 'project4:download' %}" style="display: inline-block; padding: 20px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); transition: all 0.3s ease; min-width: 280px; text-align: center;">
+                <span style="font-size: 20px; margin-right: 8px;">📄</span>
+                <span>Download Study Details (PDF)</span>
+            </a>
+
+            <!-- Start Study Button - FIXED -->
+            <a href="{% url 'project4:study' %}" style="display: inline-block; padding: 20px 30px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: all 0.3s ease; min-width: 280px; text-align: center;">
+                <span style="font-size: 20px; margin-right: 8px;">🚀</span>
+                <span>Start the Study</span>
+            </a>
+        </div>
+
+        <p style="margin: 20px 0 0 0; color: #666; font-size: 14px;">
+            💡 <em>We recommend downloading the PDF first to understand the study methodology</em>
+        </p>
+    </div>
+
+    <!-- Footer Note -->
+    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 3px solid #6c757d;">
+        <p style="margin: 0; font-size: 14px; color: #6c757d; line-height: 1.5;">
+            <strong>Note:</strong> This study is part of academic research on human-centric artificial intelligence. 
+            Your participation helps us understand how to design better recommendation systems that are more transparent and user-friendly.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+// Enhanced button hover effects
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('a[href*="project4"]');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = this.style.boxShadow.replace('0.3)', '0.5)');
+        });
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = this.style.boxShadow.replace('0.5)', '0.3)');
+        });
+    });
+});
+</script>
+{% endblock %}

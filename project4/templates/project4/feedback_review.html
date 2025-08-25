@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="title-container" style="text-align: center; margin-bottom: 30px;">
+        <h2 style="font-size: 26px; color: #4f7ecb;">📋 Detailed Feedback Review</h2>
+        <p style="color: #666;">Complete feedback data from all study participants</p>
+    </div>
+
+    <div class="main-text" style="max-width: 1200px; margin: 0 auto;">
+        <!-- Summary Stats -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #1976d2;">{{ feedbacks|length }}</div>
+                <div style="color: #666;">Total Responses</div>
+            </div>
+            
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #2e7d32;">
+                    {% for feedback in feedbacks %}
+                        {% if feedback.helpfulness == "very_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
+                    {% empty %}0{% endfor %}
+                </div>
+                <div style="color: #666;">Very Helpful</div>
+            </div>
+            
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #f57c00;">
+                    {% for feedback in feedbacks %}
+                        {% if feedback.helpfulness == "somewhat_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
+                    {% empty %}0{% endfor %}
+                </div>
+                <div style="color: #666;">Somewhat Helpful</div>
+            </div>
+            
+            <div style="background: #ffebee; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #d32f2f;">
+                    {% for feedback in feedbacks %}
+                        {% if feedback.helpfulness == "not_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
+                    {% empty %}0{% endfor %}
+                </div>
+                <div style="color: #666;">Not Helpful</div>
+            </div>
+        </div>
+
+        <!-- Filter and Search -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div>
+                    <label for="helpfulnessFilter" style="font-weight: bold; margin-right: 10px;">Filter by helpfulness:</label>
+                    <select id="helpfulnessFilter" onchange="filterFeedback()" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">All responses</option>
+                        <option value="very_helpful">Very Helpful</option>
+                        <option value="somewhat_helpful">Somewhat Helpful</option>
+                        <option value="not_helpful">Not Helpful</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="movieSearch" style="font-weight: bold; margin-right: 10px;">Search movies:</label>
+                    <input type="text" id="movieSearch" placeholder="Type movie name..." 
+                           onkeyup="filterFeedback()" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
+                </div>
+                
+                <div style="margin-left: auto;">
+                    <button onclick="clearFilters()" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Table -->
+        <div style="background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto;">
+            <table id="feedbackTable" style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th style="padding: 15px; text-align: left; font-weight: bold; cursor: pointer;" onclick="sortTable(0)">
+                            Movie Title 
+                            <span style="font-size: 12px; opacity: 0.8;">▼</span>
+                        </th>
+                        <th style="padding: 15px; text-align: center; font-weight: bold; cursor: pointer;" onclick="sortTable(1)">
+                            Helpfulness 
+                            <span style="font-size: 12px; opacity: 0.8;">▼</span>
+                        </th>
+                        <th style="padding: 15px; text-align: left; font-weight: bold;">Comments</th>
+                        <th style="padding: 15px; text-align: center; font-weight: bold; cursor: pointer;" onclick="sortTable(3)">
+                            Submitted 
+                            <span style="font-size: 12px; opacity: 0.8;">▼</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feedback in feedbacks %}
+                    <tr class="feedback-row" 
+                        data-helpfulness="{{ feedback.helpfulness }}"
+                        data-movie="{{ feedback.movie_title|lower }}"
+                        style="border-bottom: 1px solid #eee; {% if forloop.counter0|divisibleby:2 %}background-color: #f8f9fa;{% endif %} transition: background-color 0.2s;">
+                        <td style="padding: 12px; font-weight: 500;">
+                            <div style="font-size: 14px; color: #333;">{{ feedback.movie_title }}</div>
+                            {% if feedback.movie_title|length > 50 %}
+                            <div style="font-size: 12px; color: #666; margin-top: 2px;">{{ feedback.movie_title|truncatechars:50 }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; text-align: center;">
+                            <span style="padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; 
+                                background: {% if feedback.helpfulness == 'very_helpful' %}#28a745{% elif feedback.helpfulness == 'somewhat_helpful' %}#ffc107{% else %}#dc3545{% endif %};">
+                                {% if feedback.helpfulness == 'very_helpful' %}😊 Very Helpful{% elif feedback.helpfulness == 'somewhat_helpful' %}😐 Somewhat Helpful{% else %}😞 Not Helpful{% endif %}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; max-width: 300px;">
+                            {% if feedback.comments %}
+                                <div style="font-style: italic; color: #495057; line-height: 1.4;">
+                                    {% if feedback.comments|length > 100 %}
+                                        <span class="comment-short">{{ feedback.comments|truncatechars:100 }}</span>
+                                        <span class="comment-full" style="display: none;">{{ feedback.comments }}</span>
+                                        <a href="#" onclick="toggleComment(this); return false;" style="color: #007bff; font-size: 12px; text-decoration: none;">
+                                            Show more
+                                        </a>
+                                    {% else %}
+                                        "{{ feedback.comments }}"
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span style="color: #6c757d; font-style: italic;">No comment provided</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; text-align: center; color: #6c757d; font-size: 14px;">
+                            <div>{{ feedback.submitted_at|date:"M d, Y" }}</div>
+                            <small style="color: #999;">{{ feedback.submitted_at|date:"H:i" }}</small>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <div style="font-size: 48px; margin-bottom: 15px;">📝</div>
+                            <div style="font-size: 18px; margin-bottom: 5px;">No feedback submitted yet</div>
+                            <div style="font-size: 14px;">Responses will appear here as participants complete the study</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Show filtered results info -->
+            <div id="filterInfo" style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 4px; text-align: center; display: none;">
+                <span id="filteredCount">0</span> of {{ feedbacks|length }} responses shown
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{% url 'project4:index' %}" style="display: inline-block; padding: 12px 24px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 6px; margin-right: 10px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#5a6268'" onmouseout="this.style.backgroundColor='#6c757d'">
+                🏠 Back to Home
+            </a>
+            <a href="{% url 'project4:analytics' %}" style="display: inline-block; padding: 12px 24px; background-color: #667eea; color: white; text-decoration: none; border-radius: 6px; margin-right: 10px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#5a6fd8'" onmouseout="this.style.backgroundColor='#667eea'">
+                📊 View Analytics
+            </a>
+            <a href="{% url 'project4:export_feedback' %}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 6px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
+                📥 Export Data (CSV)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+// Filtering functionality
+function filterFeedback() {
+    const helpfulnessFilter = document.getElementById('helpfulnessFilter').value.toLowerCase();
+    const movieSearch = document.getElementById('movieSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('.feedback-row');
+    const filterInfo = document.getElementById('filterInfo');
+    const filteredCount = document.getElementById('filteredCount');
+    
+    let visibleCount = 0;
+    let hasFilters = helpfulnessFilter || movieSearch;
+    
+    rows.forEach(row => {
+        const helpfulness = row.getAttribute('data-helpfulness').toLowerCase();
+        const movie = row.getAttribute('data-movie');
+        
+        let showRow = true;
+        
+        // Apply helpfulness filter
+        if (helpfulnessFilter && !helpfulness.includes(helpfulnessFilter)) {
+            showRow = false;
+        }
+        
+        // Apply movie search filter
+        if (movieSearch && !movie.includes(movieSearch)) {
+            showRow = false;
+        }
+        
+        if (showRow) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show/hide filter info
+    if (hasFilters) {
+        filteredCount.textContent = visibleCount;
+        filterInfo.style.display = 'block';
+    } else {
+        filterInfo.style.display = 'none';
+    }
+}
+
+// Clear all filters
+function clearFilters() {
+    document.getElementById('helpfulnessFilter').value = '';
+    document.getElementById('movieSearch').value = '';
+    filterFeedback();
+}
+
+// Toggle comment display
+function toggleComment(element) {
+    const shortComment = element.parentElement.querySelector('.comment-short');
+    const fullComment = element.parentElement.querySelector('.comment-full');
+    
+    if (shortComment.style.display === 'none') {
+        shortComment.style.display = 'inline';
+        fullComment.style.display = 'none';
+        element.textContent = 'Show more';
+    } else {
+        shortComment.style.display = 'none';
+        fullComment.style.display = 'inline';
+        element.textContent = 'Show less';
+    }
+}
+
+// Table sorting functionality
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+    const table = document.getElementById('feedbackTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('.feedback-row'));
+    
+    // Determine sort direction
+    const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+    sortDirection[columnIndex] = direction;
+    
+    // Sort rows
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch(columnIndex) {
+            case 0: // Movie title
+                aValue = a.cells[0].textContent.trim().toLowerCase();
+                bValue = b.cells[0].textContent.trim().toLowerCase();
+                break;
+            case 1: // Helpfulness
+                const helpfulnessOrder = {'very_helpful': 3, 'somewhat_helpful': 2, 'not_helpful': 1};
+                aValue = helpfulnessOrder[a.getAttribute('data-helpfulness')] || 0;
+                bValue = helpfulnessOrder[b.getAttribute('data-helpfulness')] || 0;
+                break;
+            case 3: // Date
+                aValue = new Date(a.cells[3].textContent.trim());
+                bValue = new Date(b.cells[3].textContent.trim());
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    // Re-append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Update sort indicators
+    const headers = table.querySelectorAll('th');
+    headers.forEach((header, index) => {
+        const indicator = header.querySelector('span');
+        if (indicator) {
+            if (index === columnIndex) {
+                indicator.textContent = direction === 'asc' ? '▲' : '▼';
+            } else {
+                indicator.textContent = '▼';
+            }
+        }
+    });
+}
+
+// Add hover effects to table rows
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.feedback-row');
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#e3f2fd';
+        });
+        row.addEventListener('mouseleave', function() {
+            const isEven = Array.from(this.parentElement.children).indexOf(this) % 2 === 0;
+            this.style.backgroundColor = isEven ? '#f8f9fa' : '';
+        });
+    });
+});
+</script>
+{% endblock %}
+

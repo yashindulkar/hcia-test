@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Your existing CSS remains unchanged -->
+{% endblock %}
+
+{% block content %}
+<div class="box">
+
+  <!-- 🔹 Title -->
+  <div class="title-container">
+    <h1>Project 3: Palmer Penguins Models</h1>
+  </div>
+
+  <!-- 🔹 Lambda Control -->
+  <div class="lambda-control">
+    <h2>Model Sparsity Function (λ)</h2>
+    <div class="lambda-formula">
+      arg min<sub>f</sub> 1/n ∑<sub>i=1</sub><sup>n</sup> ℓ(f(x<sub>i</sub>), y<sub>i</sub>) + λΩ(f)
+    </div>
+    <div style="margin-top: 15px;">
+      <strong>Current max_depth:</strong> <span id="max-depth-display">{{ max_depth }}</span>
+    </div>
+    <div class="slider-container">
+      <span>Less sparse</span>
+      <input type="range" id="lambda-slider" class="slider" min="0.001" max="1" step="0.001" value="{{ lambda_value }}">
+      <span>More sparse</span>
+      <div class="lambda-value">λ = <span id="lambda-display">{{ lambda_value }}</span></div>
+    </div>
+    <div class="loading" id="loading-indicator">
+      <p>Updating models... <span id="loading-spinner">⏳</span></p>
+    </div>
+  </div>
+
+  {% if error %}
+    <p style="color:red; text-align:center;">{{ error }}</p>
+  {% else %}
+
+  <!-- Tab Buttons -->
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <button class="tab-button active-tab" onclick="showTab('tree-tab', this)">Decision Tree</button>
+  <button class="tab-button" onclick="showTab('logistic-tab', this)">Logistic Regression</button>
+</div>
+
+<!-- Decision Tree Tab -->
+<div id="tree-tab" class="tab-content" style="display: block;">
+  <h2 style="text-align: center;">Decision Tree</h2>
+  <div class="metrics-container" style="display: flex; justify-content: center; gap: 20px;">
+    <div class="metric-card"><h3>Accuracy</h3><p id="accuracy-display">{{ tree_accuracy }}%</p></div>
+    <div class="metric-card"><h3>Tree Complexity</h3><p id="leaves-display">{{ tree_n_leaves }} leaves</p></div>
+  </div>
+  <div class="tree-container">
+    <img src="data:image/png;base64,{{ tree_plot }}" alt="Decision Tree" id="tree-image" style="max-width:100%; height:auto;">
+  </div>
+  <div class="feature-item">
+    <h3>Feature Importance (Tree)</h3>
+    <img src="data:image/png;base64,{{ importance_plot }}" alt="Tree Feature Importance" id="importance-image" style="max-width:100%; height:auto;">
+  </div>
+</div>
+
+<!-- Logistic Regression Tab -->
+<div id="logistic-tab" class="tab-content" style="display: none;">
+  <h2 style="text-align: center;">Logistic Regression</h2>
+  <div class="metrics-container" style="display: flex; justify-content: center; gap: 20px;">
+    <div class="metric-card"><h3>Accuracy</h3><p id="logistic-accuracy-display">{{ logistic_accuracy }}%</p></div>
+    <div class="metric-card"><h3>Feature Complexity</h3><p id="logistic-features-display">{{ logistic_n_features }} features</p></div>
+  </div>
+  <div class="tree-container">
+    <img src="data:image/png;base64,{{ logistic_plot }}" alt="Logistic Coefficients" id="logistic-image" style="max-width:100%; height:auto;">
+  </div>
+</div>
+
+
+  
+
+    
+
+    
+  </div>
+
+  <!-- 🔹 Correlation Plot -->
+  <div class="feature-item" style="margin-top: 40px;">
+    <h2 style="text-align: center;">Correlation Plot</h2>
+    <img src="data:image/png;base64,{{ corr_plot }}" alt="Correlation Plot" style="max-width:100%; height:auto;">
+  </div>
+
+  <!-- 🔹 Dataset Info -->
+  <div class="dataset-info-box" style="margin-top: 40px;">
+    <h2>Dataset Information</h2>
+    <p><strong>Dataset:</strong> Palmer Penguins</p>
+    <p><strong>Target Variable:</strong> {{ target }}</p>
+    <p><strong>Features:</strong></p>
+    <ul style="columns: 2;">
+      {% for feature in features %}
+        <li>{{ feature }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const lambdaSlider = document.getElementById('lambda-slider');
+  const lambdaDisplay = document.getElementById('lambda-display');
+  const accuracyDisplay = document.getElementById('accuracy-display');
+  const leavesDisplay = document.getElementById('leaves-display');
+  const treeImage = document.getElementById('tree-image');
+  const importanceImage = document.getElementById('importance-image');
+  const logisticAccuracyDisplay = document.getElementById('logistic-accuracy-display');
+  const logisticFeaturesDisplay = document.getElementById('logistic-features-display');
+  const logisticImage = document.getElementById('logistic-image');
+  const maxDepthDisplay = document.getElementById('max-depth-display');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  const loadingSpinner = document.getElementById('loading-spinner');
+
+  let updateTimeout;
+  const DEBOUNCE_DELAY = 500;
+
+  lambdaSlider.addEventListener('input', function() {
+    lambdaDisplay.textContent = parseFloat(this.value).toFixed(3);
+  });
+
+  lambdaSlider.addEventListener('change', function() {
+    if (updateTimeout) clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(() => updateModel(lambdaSlider.value), DEBOUNCE_DELAY);
+  });
+
+  let animationFrame = 0;
+  const loadingChars = ['⏳', '⌛'];
+
+  function animateLoading() {
+    if (loadingIndicator.style.display === 'block') {
+      animationFrame = (animationFrame + 1) % loadingChars.length;
+      loadingSpinner.textContent = loadingChars[animationFrame];
+      setTimeout(animateLoading, 500);
+    }
+  }
+
+  function updateModel(lambdaValue) {
+    loadingIndicator.style.display = 'block';
+    animateLoading();
+
+    fetch('{% url "project3:update_model" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ lambda: lambdaValue })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      // Decision Tree Updates
+      accuracyDisplay.textContent = data.tree_accuracy + '%';
+      leavesDisplay.textContent = data.tree_n_leaves + ' leaves';
+      treeImage.src = 'data:image/png;base64,' + data.tree_plot;
+      importanceImage.src = 'data:image/png;base64,' + data.importance_plot;
+      maxDepthDisplay.textContent = data.max_depth;
+
+      // Logistic Regression Updates
+      logisticAccuracyDisplay.textContent = data.logistic_accuracy + '%';
+      logisticFeaturesDisplay.textContent = data.logistic_n_features + ' features';
+      logisticImage.src = 'data:image/png;base64,' + data.logistic_plot;
+
+      loadingIndicator.style.display = 'none';
+    })
+    .catch(error => {
+      console.error('Error updating models:', error);
+      loadingIndicator.style.display = 'none';
+      alert('Error updating models.');
+    });
+  }
+
+  function showTab(tabId, button) {
+  document.getElementById('tree-tab').style.display = (tabId === 'tree-tab') ? 'block' : 'none';
+  document.getElementById('logistic-tab').style.display = (tabId === 'logistic-tab') ? 'block' : 'none';
+
+  const buttons = document.querySelectorAll('.tab-button');
+  buttons.forEach(btn => btn.classList.remove('active-tab'));
+  button.classList.add('active-tab');
+}
+});
+</script>
+{% endblock %}
+
+

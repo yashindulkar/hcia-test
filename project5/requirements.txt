@@ -1,0 +1,14 @@
+# Core dependencies for RLHF Mouse Project
+Django>=4.0
+numpy>=1.21.0
+torch>=1.9.0
+torchvision>=0.10.0
+
+# Optional but recommended
+matplotlib>=3.5.0  # For plotting training curves
+tensorboard>=2.8.0  # For training visualization
+tqdm>=4.62.0  # Progress bars during training
+
+# For production deployment (optional)
+gunicorn>=20.1.0
+whitenoise>=6.0.0

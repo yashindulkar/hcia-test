@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+  <div class="title-container" style="margin-top: 2rem;">
+    <div class="title">Active Learning: Iteration</div>
+  </div>
+
+  <div class="main-text">
+    <p><strong>Current Accuracy:</strong> {{ accuracy }}</p>
+    <p><strong>Labeled Samples:</strong> {{ labeled_count }}</p>
+    <p><strong>Remaining Unlabeled Samples:</strong> {{ remaining }}</p>
+
+    <form method="post" style="margin-top: 1rem;">
+      {% csrf_token %}
+      <button type="submit">Next Iteration</button>
+    </form>
+
+    <div style="margin-top: 1.5rem;">
+      <a href="{% url 'project2:index' %}" style="text-decoration: none;">
+        <button type="button">Back to Project 2 Home</button>
+      </a>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <a href="{% url 'project2:active_reset' %}" style="text-decoration: none;">
+            <button type="button">Start Fresh</button>
+        </a>
+    </div>
+
+    {% if accuracy_plot %}
+      <div style="margin-top: 2rem;">
+        <h3>Accuracy Progress</h3>
+        <img src="{% static accuracy_plot %}" alt="Accuracy Plot"
+             style="max-width: 100%; height: auto; border: 1px solid #ccc;" />
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
