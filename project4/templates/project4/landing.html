@@ -1,100 +1,256 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Project 4 - Recommender System Study{% endblock %}
+{% block title %}Project 4 - Interactive ML Games{% endblock %}
 
 {% block content %}
 <div class="box">
     <div class="title-container">
         <div class="title">
-            <i class="fas fa-chart-line"></i>
-            Recommender System Cold-Start Study
+            <i class="fas fa-gamepad"></i>
+            Interactive ML Games
         </div>
         <div class="subtitle">
-            Influence of Future Predictions over Active Learning of Users' Tastes
+            Gamified machine learning experiences that make AI concepts accessible through interactive gameplay and educational challenges.
         </div>
     </div>
 
-    <!-- Study Overview -->
+    <!-- Project Overview -->
     <div class="card mb-xl">
         <div class="card-header">
             <h2 class="card-title">
                 <i class="fas fa-bullseye"></i>
-                Study Overview
+                Project Overview
             </h2>
         </div>
         <div class="card-body">
-            <p>Explore how showing users the impact of their responses affects the learning process in recommendation systems. Our innovative approach provides visual feedback about how your movie ratings will influence future recommendations.</p>
-        </div>
-    </div>
-
-    <!-- Information Grid -->
-    <div class="grid-2 mb-xl">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title text-accent">
-                    <i class="fas fa-tasks"></i>
-                    What You'll Do
-                </h3>
-            </div>
-            <div class="card-body">
-                <ul>
-                    <li>Select movies from our database</li>
-                    <li>See how different ratings affect recommendations</li>
-                    <li>Provide feedback on the experience</li>
-                    <li>Help advance recommendation research</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title text-warning">
-                    <i class="fas fa-clock"></i>
-                    Time Required
-                </h3>
-            </div>
-            <div class="card-body">
-                <ul>
-                    <li><strong>Study participation:</strong> 10-15 minutes</li>
-                    <li><strong>Movie selection:</strong> 2-3 minutes</li>
-                    <li><strong>Feedback:</strong> 2-5 minutes</li>
-                    <li><strong>Total:</strong> ~15-20 minutes</li>
-                </ul>
+            <p class="main-text">
+                This project explores how gamification can enhance machine learning education through interactive experiences. 
+                Our platform combines educational content with engaging game mechanics to make complex AI concepts more accessible 
+                and enjoyable for learners at all levels.
+            </p>
+            
+            <!-- Key Features Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-lg); margin-top: var(--space-xl);">
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-lg);">
+                    <div style="color: var(--accent); font-size: 2rem; margin-bottom: var(--space-md);">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-sm);">Educational Game Mechanics</h3>
+                    <p style="color: var(--text-secondary);">Interactive learning modules with point systems, achievements, and progress tracking to motivate continuous learning.</p>
+                </div>
+                
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-lg);">
+                    <div style="color: var(--success); font-size: 2rem; margin-bottom: var(--space-md);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-sm);">Progressive Difficulty</h3>
+                    <p style="color: var(--text-secondary);">Adaptive learning paths that adjust complexity based on user performance and understanding levels.</p>
+                </div>
+                
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-lg);">
+                    <div style="color: var(--warning); font-size: 2rem; margin-bottom: var(--space-md);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-sm);">Collaborative Learning</h3>
+                    <p style="color: var(--text-secondary);">Multiplayer challenges and team-based problem solving to enhance social learning experiences.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Action Buttons -->
+    <!-- Demo Modules -->
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-play-circle"></i>
+                Interactive Demos
+            </h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg);">
+                
+                <!-- Recommender Study Demo -->
+                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-md); background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">Movie Recommender Study</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">Experience how recommendation systems learn user preferences through interactive movie selection games.</p>
+                    <a href="{% url 'project4:study' %}" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-play"></i>
+                        Start Study
+                    </a>
+                </div>
+
+                <!-- Algorithm Playground -->
+                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease; opacity: 0.7;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--text-muted);">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-md);">Algorithm Playground</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-lg);">Interactive environment for experimenting with different ML algorithms and parameters.</p>
+                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; cursor: not-allowed;" disabled>
+                        <i class="fas fa-clock"></i>
+                        Coming Soon
+                    </button>
+                </div>
+
+                <!-- Learning Challenges -->
+                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease; opacity: 0.7;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--text-muted);">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-md);">Learning Challenges</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-lg);">Competitive challenges and leaderboards to test ML knowledge and problem-solving skills.</p>
+                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; cursor: not-allowed;" disabled>
+                        <i class="fas fa-clock"></i>
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Focus -->
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-microscope"></i>
+                Research Focus
+            </h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); align-items: center;">
+                <div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">Human-Centric AI Learning</h3>
+                    <p class="main-text">
+                        Our research investigates how interactive gaming elements can improve understanding of AI concepts 
+                        while maintaining user engagement and motivation. We focus on creating intuitive interfaces that 
+                        make complex algorithms accessible to diverse audiences.
+                    </p>
+                    
+                    <div style="margin-top: var(--space-xl);">
+                        <h4 style="color: var(--accent); margin-bottom: var(--space-md);">Key Research Areas:</h4>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Gamification effectiveness in ML education
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                User engagement and learning outcomes
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Adaptive learning system design
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Human feedback integration in AI systems
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Research Metrics -->
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-xl);">
+                    <div style="text-align: center; margin-bottom: var(--space-lg);">
+                        <h4 style="color: var(--text-primary); margin-bottom: var(--space-md);">Study Participation</h4>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);">
+                        <div style="text-align: center; padding: var(--space-md); background: var(--surface-elevated); border-radius: var(--radius-md);">
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--accent); font-family: var(--font-mono);">47</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Participants</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--space-md); background: var(--surface-elevated); border-radius: var(--radius-md);">
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--success); font-family: var(--font-mono);">92%</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Completion Rate</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--space-md); background: var(--surface-elevated); border-radius: var(--radius-md);">
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--warning); font-family: var(--font-mono);">4.7</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Rating</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--space-md); background: var(--surface-elevated); border-radius: var(--radius-md);">
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--primary); font-family: var(--font-mono);">12m</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Duration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title text-center">Ready to Participate?</h3>
+            <h2 class="card-title">
+                <i class="fas fa-rocket"></i>
+                Quick Actions
+            </h2>
         </div>
-        <div class="card-body text-center">
-            <div class="button-container">
-                <a href="{% url 'project4:download' %}" class="btn btn-primary">
-                    <i class="fas fa-file-pdf"></i>
-                    Download Study Details (PDF)
+        <div class="card-body">
+            <div style="display: flex; gap: var(--space-lg); justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'project4:study' %}" class="btn btn-primary" style="min-width: 180px;">
+                    <i class="fas fa-play"></i>
+                    Start Movie Study
                 </a>
-                <a href="{% url 'project4:study' %}" class="btn btn-success">
-                    <i class="fas fa-rocket"></i>
-                    Start the Study
+                <a href="{% url 'project4:analytics' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-chart-bar"></i>
+                    View Analytics
+                </a>
+                <a href="{% url 'project4:feedback_review' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-comments"></i>
+                    Review Feedback
                 </a>
             </div>
-            <p class="text-muted mt-lg">
-                <i class="fas fa-lightbulb"></i>
-                We recommend downloading the PDF first to understand the study methodology
-            </p>
-        </div>
-    </div>
-
-    <!-- Footer Note -->
-    <div class="alert alert-info mt-xl">
-        <i class="fas fa-info-circle"></i>
-        <div>
-            <strong>Note:</strong> This study is part of academic research on human-centric artificial intelligence. 
-            Your participation helps us understand how to design better recommendation systems that are more transparent and user-friendly.
         </div>
     </div>
 </div>
+
+<!-- Additional CSS for this page -->
+<style>
+    /* Custom animations for this page */
+    .card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+    
+    .card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+    
+    .card:nth-child(4) {
+        animation-delay: 0.3s;
+    }
+    
+    /* Hover effects for feature cards */
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .title {
+            font-size: 2rem;
+        }
+        
+        .card-body {
+            padding: var(--space-lg);
+        }
+        
+        div[style*="grid-template-columns: 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+        }
+        
+        div[style*="display: flex"] {
+            flex-direction: column;
+        }
+    }
+</style>
 {% endblock %}

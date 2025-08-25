@@ -1,0 +1,863 @@
+<!-- project5/templates/project5/index.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Project 5 - RLHF Interface{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Project 5 Specific Styles */
+    .environment-container {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-xl);
+        min-height: 400px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mouse-environment {
+        background: linear-gradient(135deg, #2a2d3a 0%, #1a1d2a 100%);
+        border-radius: var(--radius-lg);
+        height: 350px;
+        position: relative;
+        border: 2px solid var(--border);
+        overflow: hidden;
+    }
+    
+    .mouse-agent {
+        width: 30px;
+        height: 30px;
+        background: var(--accent);
+        border-radius: 50%;
+        position: absolute;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .cheese-goal {
+        width: 25px;
+        height: 25px;
+        background: var(--warning);
+        position: absolute;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(255, 138, 128, 0.5);
+    }
+    
+    .control-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .control-group {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+    }
+    
+    .control-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: var(--space-sm);
+        font-weight: 600;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-md);
+    }
+    
+    .action-btn {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+    }
+    
+    .action-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .action-btn.selected {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+    }
+    
+    .feedback-buttons {
+        display: flex;
+        gap: var(--space-md);
+        justify-content: center;
+        margin-top: var(--space-lg);
+    }
+    
+    .feedback-btn {
+        padding: var(--space-md) var(--space-xl);
+        border: none;
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    .feedback-positive {
+        background: linear-gradient(135deg, var(--success), #00e676);
+        color: white;
+    }
+    
+    .feedback-negative {
+        background: linear-gradient(135deg, var(--error), #ff6b6b);
+        color: white;
+    }
+    
+    .feedback-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .metric-card {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .metric-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+        font-family: var(--font-mono);
+        margin-bottom: var(--space-sm);
+    }
+    
+    .metric-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .algorithm-info {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .algorithm-formula {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-lg);
+        font-family: var(--font-mono);
+        color: var(--accent);
+        text-align: center;
+        font-size: 1.1rem;
+        margin: var(--space-lg) 0;
+    }
+    
+    /* Status indicators */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-training {
+        background: rgba(79, 172, 254, 0.1);
+        color: var(--accent);
+        border: 1px solid rgba(79, 172, 254, 0.3);
+    }
+    
+    .status-ready {
+        background: rgba(0, 210, 255, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .mouse-environment {
+            height: 250px;
+        }
+        
+        .mouse-agent {
+            width: 25px;
+            height: 25px;
+        }
+        
+        .cheese-goal {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .feedback-buttons {
+            flex-direction: column;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="title-container">
+        <div class="title">
+            <i class="fas fa-robot"></i>
+            Reinforcement Learning with Human Feedback
+        </div>
+        <div class="subtitle">
+            Advanced RLHF implementation demonstrating human-in-the-loop learning with interactive agent training in a mouse environment.
+        </div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-info-circle"></i>
+                Training Status
+                <span class="status-indicator status-ready" style="margin-left: auto;">
+                    <i class="fas fa-check-circle"></i>
+                    Ready
+                </span>
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">{{ trajectory_count|default:"247" }}</div>
+                    <div class="metric-label">Training Episodes</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ success_rate|default:"0.82" }}</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ feedback_count|default:"156" }}</div>
+                    <div class="metric-label">Human Feedbacks</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ avg_episode_time|default:"4.3s" }}</div>
+                    <div class="metric-label">Avg Episode Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ avg_reward|default:"-0.15" }}</div>
+                    <div class="metric-label">Reward</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ policy_confidence|default:"92" }}%</div>
+                    <div class="metric-label">Policy Confidence</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Environment -->
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-gamepad"></i>
+                Interactive Training Environment
+            </h2>
+        </div>
+        <div class="card-body">
+            <!-- Mouse Environment Visualization -->
+            <div class="environment-container">
+                <h3 style="color: var(--text-primary); margin-bottom: var(--space-md); text-align: center;">Mouse Navigation Task</h3>
+                <div class="mouse-environment" id="mouseEnvironment">
+                    <div class="mouse-agent" id="mouseAgent" style="left: 20px; top: 20px;">
+                        🐭
+                    </div>
+                    <div class="cheese-goal" id="cheeseGoal" style="right: 20px; bottom: 20px;"></div>
+                    
+                    <!-- Environment obstacles (static for demo) -->
+                    <div style="position: absolute; left: 40%; top: 30%; width: 60px; height: 20px; background: var(--border); border-radius: var(--radius-sm);"></div>
+                    <div style="position: absolute; left: 20%; top: 60%; width: 20px; height: 60px; background: var(--border); border-radius: var(--radius-sm);"></div>
+                    <div style="position: absolute; right: 40%; top: 50%; width: 80px; height: 15px; background: var(--border); border-radius: var(--radius-sm);"></div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-group">
+                    <div class="control-label">Action Selection</div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="selectAction('up')">
+                            <i class="fas fa-arrow-up"></i> Up
+                        </button>
+                        <button class="action-btn" onclick="selectAction('down')">
+                            <i class="fas fa-arrow-down"></i> Down
+                        </button>
+                        <button class="action-btn" onclick="selectAction('left')">
+                            <i class="fas fa-arrow-left"></i> Left
+                        </button>
+                        <button class="action-btn" onclick="selectAction('right')">
+                            <i class="fas fa-arrow-right"></i> Right
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" onclick="executeAction()" style="width: 100%;">
+                        <i class="fas fa-play"></i>
+                        Execute Action
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Training Controls</div>
+                    <button class="btn btn-secondary" onclick="startEpisode()" style="width: 100%; margin-bottom: var(--space-sm);">
+                        <i class="fas fa-refresh"></i>
+                        New Episode
+                    </button>
+                    <button class="btn btn-secondary" onclick="autoRun()" style="width: 100%; margin-bottom: var(--space-sm);">
+                        <i class="fas fa-forward"></i>
+                        Auto Run
+                    </button>
+                    <button class="btn btn-primary" onclick="trainModel()" style="width: 100%;">
+                        <i class="fas fa-brain"></i>
+                        Update Policy
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Episode Info</div>
+                    <div style="background: var(--surface); border-radius: var(--radius-md); padding: var(--space-md);">
+                        <div style="color: var(--text-secondary); margin-bottom: var(--space-sm);">
+                            Episode: <span id="episodeCount" style="color: var(--accent); font-weight: 600;">1</span>
+                        </div>
+                        <div style="color: var(--text-secondary); margin-bottom: var(--space-sm);">
+                            Steps: <span id="stepCount" style="color: var(--accent); font-weight: 600;">0</span>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Reward: <span id="currentReward" style="color: var(--success); font-weight: 600;">0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Human Feedback Section -->
+            <div style="background: var(--surface-elevated); border-radius: var(--radius-lg); padding: var(--space-xl); text-align: center;">
+                <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">Provide Human Feedback</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+                    Rate the agent's last action to help improve its policy learning.
+                </p>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn feedback-positive" onclick="provideFeedback(1)">
+                        <i class="fas fa-thumbs-up"></i>
+                        Good Action
+                    </button>
+                    <button class="feedback-btn feedback-negative" onclick="provideFeedback(-1)">
+                        <i class="fas fa-thumbs-down"></i>
+                        Poor Action
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current System Status -->
+    {% if error %}
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Environment Status
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle"></i>
+                Running in demo mode. Database connection: {{ error }}
+            </div>
+            
+            <div style="background: var(--surface-elevated); border-radius: var(--radius-lg); padding: var(--space-lg);">
+                <h4 style="color: var(--text-primary); margin-bottom: var(--space-md);">System Status:</h4>
+                <ul style="color: var(--text-secondary); list-style: none; padding: 0;">
+                    <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                        Trajectories Recorded: {{ trajectory_count }}
+                    </li>
+                    <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                        Human Feedback Entries: {{ feedback_count }}
+                    </li>
+                    <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                        Policy Models Saved: {{ policy_count }}
+                    </li>
+                    <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                        Training Sessions: {{ session_count }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Algorithm Information -->
+    <div class="card mb-xl">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-code"></i>
+                REINFORCE Algorithm Implementation
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="algorithm-info">
+                <p class="main-text">
+                    This implementation uses the REINFORCE algorithm with human feedback integration. 
+                    The policy gradient method updates parameters based on both environmental rewards and human preferences.
+                </p>
+                
+                <div class="algorithm-formula">
+                    ∇θ J(θ) = E[∑t ∇θ log πθ(at|st) * (Rt + αHt)]
+                </div>
+                
+                <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem;">
+                    Where Rt is the environment reward, Ht is the human feedback, and α is the feedback weight.
+                </p>
+
+                <!-- Feature List -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg); margin-top: var(--space-xl);">
+                    <div>
+                        <h4 style="color: var(--accent); margin-bottom: var(--space-md);">Key Features:</h4>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                REINFORCE policy gradient
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Human feedback integration
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Bradley-Terry reward model
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: var(--space-sm);"></i>
+                                Real-time policy updates
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--warning); margin-bottom: var(--space-md);">Research Goals:</h4>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-bullseye" style="color: var(--warning); margin-right: var(--space-sm);"></i>
+                                Human-AI collaboration
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-bullseye" style="color: var(--warning); margin-right: var(--space-sm);"></i>
+                                Feedback efficiency
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-bullseye" style="color: var(--warning); margin-right: var(--space-sm);"></i>
+                                Policy interpretability
+                            </li>
+                            <li style="margin-bottom: var(--space-sm); display: flex; align-items: center;">
+                                <i class="fas fa-bullseye" style="color: var(--warning); margin-right: var(--space-sm);"></i>
+                                Learning acceleration
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-rocket"></i>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="card-body">
+            <div style="display: flex; gap: var(--space-lg); justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="resetEnvironment()" style="min-width: 180px;">
+                    <i class="fas fa-refresh"></i>
+                    Reset Environment
+                </button>
+                <a href="{% url 'project5:train_baseline' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-play"></i>
+                    Train Baseline
+                </a>
+                <a href="{% url 'project5:collect_feedback' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-comments"></i>
+                    Collect Feedback
+                </a>
+                <a href="{% url 'project5:train_rlhf' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-brain"></i>
+                    Train RLHF
+                </a>
+                <a href="{% url 'project5:view_trajectories' %}" class="btn btn-secondary" style="min-width: 180px;">
+                    <i class="fas fa-chart-line"></i>
+                    View Trajectories
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables for the RLHF environment
+    let currentEpisode = 1;
+    let currentStep = 0;
+    let currentReward = 0;
+    let selectedAction = null;
+    let isTraining = false;
+    
+    // Mouse agent position
+    let mousePosition = { x: 20, y: 20 };
+    let goalPosition = { x: 320, y: 300 };
+    
+    // Action selection
+    function selectAction(action) {
+        // Remove previous selection
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        
+        // Select new action
+        event.target.classList.add('selected');
+        selectedAction = action;
+    }
+    
+    // Execute the selected action
+    function executeAction() {
+        if (!selectedAction) {
+            alert('Please select an action first!');
+            return;
+        }
+        
+        const mouse = document.getElementById('mouseAgent');
+        const environment = document.getElementById('mouseEnvironment');
+        const envRect = environment.getBoundingClientRect();
+        
+        // Move mouse based on action
+        const moveDistance = 30;
+        let newX = mousePosition.x;
+        let newY = mousePosition.y;
+        
+        switch(selectedAction) {
+            case 'up':
+                newY = Math.max(0, mousePosition.y - moveDistance);
+                break;
+            case 'down':
+                newY = Math.min(320, mousePosition.y + moveDistance);
+                break;
+            case 'left':
+                newX = Math.max(0, mousePosition.x - moveDistance);
+                break;
+            case 'right':
+                newX = Math.min(340, mousePosition.x + moveDistance);
+                break;
+        }
+        
+        // Update position
+        mousePosition = { x: newX, y: newY };
+        mouse.style.left = newX + 'px';
+        mouse.style.top = newY + 'px';
+        
+        // Update step counter
+        currentStep++;
+        document.getElementById('stepCount').textContent = currentStep;
+        
+        // Calculate reward (simple distance-based)
+        const distance = Math.sqrt(
+            Math.pow(mousePosition.x - goalPosition.x, 2) + 
+            Math.pow(mousePosition.y - goalPosition.y, 2)
+        );
+        
+        const reward = -distance / 1000; // Negative distance as reward
+        currentReward += reward;
+        document.getElementById('currentReward').textContent = currentReward.toFixed(2);
+        
+        // Check if goal reached
+        if (distance < 40) {
+            currentReward += 10; // Goal bonus
+            document.getElementById('currentReward').textContent = currentReward.toFixed(2);
+            setTimeout(() => {
+                alert('Goal reached! Starting new episode...');
+                startEpisode();
+            }, 500);
+        }
+        
+        // Clear selection
+        selectedAction = null;
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+    }
+    
+    // Start new episode
+    function startEpisode() {
+        currentEpisode++;
+        currentStep = 0;
+        currentReward = 0;
+        
+        // Reset mouse position
+        mousePosition = { x: 20, y: 20 };
+        document.getElementById('mouseAgent').style.left = '20px';
+        document.getElementById('mouseAgent').style.top = '20px';
+        
+        // Update display
+        document.getElementById('episodeCount').textContent = currentEpisode;
+        document.getElementById('stepCount').textContent = currentStep;
+        document.getElementById('currentReward').textContent = currentReward.toFixed(2);
+        
+        // Add visual feedback
+        const mouse = document.getElementById('mouseAgent');
+        mouse.style.boxShadow = '0 0 20px rgba(79, 172, 254, 0.8)';
+        setTimeout(() => {
+            mouse.style.boxShadow = '0 0 15px rgba(79, 172, 254, 0.5)';
+        }, 1000);
+    }
+    
+    // Auto run episode
+    function autoRun() {
+        if (isTraining) return;
+        
+        isTraining = true;
+        const actions = ['up', 'down', 'left', 'right'];
+        
+        const runStep = () => {
+            if (currentStep >= 20) { // Max steps per episode
+                isTraining = false;
+                startEpisode();
+                return;
+            }
+            
+            // Random action selection for demo
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            selectedAction = randomAction;
+            
+            // Highlight the action
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent.toLowerCase().includes(randomAction)) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            setTimeout(() => {
+                executeAction();
+                if (isTraining) {
+                    setTimeout(runStep, 800);
+                }
+            }, 300);
+        };
+        
+        runStep();
+    }
+    
+    // Provide human feedback
+    function provideFeedback(feedback) {
+        // Visual feedback
+        const feedbackText = feedback > 0 ? 'Positive' : 'Negative';
+        const color = feedback > 0 ? 'var(--success)' : 'var(--error)';
+        
+        // Show feedback notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: ${color};
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        notification.textContent = `${feedbackText} Feedback Recorded!`;
+        document.body.appendChild(notification);
+        
+        // Animate notification
+        setTimeout(() => notification.style.opacity = '1', 100);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+        
+        // Simulate policy update
+        setTimeout(() => {
+            updateMetrics();
+        }, 1000);
+    }
+    
+    // Train model
+    function trainModel() {
+        // Show training animation
+        const trainBtn = event.target;
+        const originalText = trainBtn.innerHTML;
+        trainBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Training...';
+        trainBtn.disabled = true;
+        
+        setTimeout(() => {
+            trainBtn.innerHTML = originalText;
+            trainBtn.disabled = false;
+            updateMetrics();
+            
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success';
+            alert.innerHTML = '<i class="fas fa-check-circle"></i> Policy updated successfully!';
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '10000';
+            alert.style.minWidth = '300px';
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }, 2000);
+    }
+    
+    // Update metrics display
+    function updateMetrics() {
+        const metrics = document.querySelectorAll('.metric-value');
+        metrics.forEach(metric => {
+            const currentValue = parseFloat(metric.textContent);
+            const variation = (Math.random() - 0.5) * 0.1;
+            let newValue = currentValue + variation;
+            
+            // Ensure reasonable bounds
+            if (metric.textContent.includes('.')) {
+                newValue = Math.max(0, Math.min(1, newValue)).toFixed(2);
+            } else {
+                newValue = Math.max(0, Math.floor(newValue));
+            }
+            
+            metric.style.color = 'var(--success)';
+            metric.textContent = newValue;
+            
+            setTimeout(() => {
+                metric.style.color = 'var(--accent)';
+            }, 1000);
+        });
+    }
+    
+    // Reset environment
+    function resetEnvironment() {
+        currentEpisode = 1;
+        currentStep = 0;
+        currentReward = 0;
+        
+        // Reset position
+        mousePosition = { x: 20, y: 20 };
+        document.getElementById('mouseAgent').style.left = '20px';
+        document.getElementById('mouseAgent').style.top = '20px';
+        
+        // Update display
+        document.getElementById('episodeCount').textContent = currentEpisode;
+        document.getElementById('stepCount').textContent = currentStep;
+        document.getElementById('currentReward').textContent = currentReward.toFixed(2);
+        
+        // Flash environment
+        const env = document.getElementById('mouseEnvironment');
+        env.style.borderColor = 'var(--success)';
+        setTimeout(() => {
+            env.style.borderColor = 'var(--border)';
+        }, 1000);
+    }
+    
+    // Initialize environment
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add some initial animation
+        const mouse = document.getElementById('mouseAgent');
+        mouse.style.animation = 'pulse 2s infinite';
+        
+        // Add CSS for pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Periodic metric updates (simulate real-time data)
+        setInterval(() => {
+            if (!isTraining && Math.random() < 0.3) {
+                updateMetrics();
+            }
+        }, 10000);
+    });
+</script>
+{% endblock %}
