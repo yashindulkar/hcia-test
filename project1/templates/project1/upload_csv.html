@@ -1,289 +1,647 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
+{% block title %}Project 1 - Supervised Learning Interface{% endblock %}
+
 {% block extra_css %}
-  <style>
-    /* 1) Make sure html/body aren't blocking scrolling: */
-    html, body {
-      height: auto !important;
-      overflow-y: auto !important;
-      margin: 0;
-      padding: 0;
+<style>
+    /* Project 1 Specific Styles */
+    .upload-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
     }
 
-    /* 2) Let your main ".box" grow beyond the viewport and scroll if needed: */
-    .box {
-      max-height: 100vh;       /* never taller than the viewport */
-      overflow-y: auto;        /* show a scrollbar when it's too tall */
-      padding: 20px;
-      box-sizing: border-box;
-      margin: 0 auto;
+    .upload-dropzone {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-2xl);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
-    
-    /* Form styling */
-    .form-group {
-      margin-bottom: 15px;
+
+    .upload-dropzone:hover {
+        border-color: var(--primary);
+        background: rgba(102, 126, 234, 0.05);
     }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
+
+    .upload-dropzone.dragover {
+        border-color: var(--accent);
+        background: rgba(79, 172, 254, 0.1);
     }
-    
-    .form-group input[type="number"],
-    .form-group input[type="text"],
-    .form-group select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-      max-width: 300px;
+
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: var(--space-lg);
     }
-    
-    .form-text {
-      font-size: 0.85em;
-      color: #6c757d;
-      margin-top: 5px;
+
+    .data-preview {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
     }
-    
-    /* Button styling */
-    button[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
+
+    .data-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
     }
-    
-    button[type="submit"]:hover {
-      background-color: #45a049;
+
+    .stat-card {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        text-align: center;
     }
-    
-    /* Results table styling */
-    #model-result table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: var(--space-xs);
     }
-    
-    #model-result th,
-    #model-result td {
-      padding: 8px;
-      text-align: left;
-      border: 1px solid #ddd;
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
     }
-    
-    #model-result th {
-      background-color: #f2f2f2;
+
+    .table-container {
+        max-height: 400px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface-elevated);
     }
-  </style>
+
+    .data-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .data-table thead {
+        position: sticky;
+        top: 0;
+        background: var(--surface-elevated);
+        z-index: 10;
+    }
+
+    .data-table th {
+        background: var(--surface);
+        border-bottom: 2px solid var(--border);
+        font-weight: 600;
+        padding: var(--space-md);
+    }
+
+    .data-table td {
+        padding: var(--space-sm) var(--space-md);
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+    }
+
+    .data-table tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Visualization Section */
+    .viz-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+    }
+
+    .viz-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+        padding: var(--space-lg);
+        background: var(--surface-elevated);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .control-group label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .control-group select {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        color: var(--text-primary);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        background: var(--surface-elevated);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: var(--space-lg);
+    }
+
+    /* Model Training Section */
+    .training-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+    }
+
+    .model-tabs {
+        display: flex;
+        gap: var(--space-xs);
+        margin-bottom: var(--space-xl);
+        background: var(--surface-elevated);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xs);
+        border: 1px solid var(--border);
+    }
+
+    .model-tab {
+        flex: 1;
+        padding: var(--space-md);
+        background: transparent;
+        border: none;
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .model-tab.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .model-params {
+        display: none;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+        background: var(--surface-elevated);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        margin-bottom: var(--space-lg);
+    }
+
+    .model-params.active {
+        display: grid;
+    }
+
+    .param-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .param-group label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .param-group input,
+    .param-group select {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        color: var(--text-primary);
+    }
+
+    .param-help {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: var(--space-xs);
+    }
+
+    /* Results Section */
+    .results-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-top: var(--space-xl);
+    }
+
+    .results-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-bottom: var(--space-xl);
+        padding-bottom: var(--space-lg);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .results-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--success), var(--accent));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .results-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+    }
+
+    .metric-card {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .metric-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: var(--space-sm);
+        font-weight: 600;
+    }
+
+    .metric-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--accent);
+    }
+
+    .results-table {
+        width: 100%;
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .results-table th {
+        background: var(--surface);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: var(--space-lg);
+        text-align: center;
+    }
+
+    .results-table td {
+        padding: var(--space-md);
+        text-align: center;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .results-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Loading States */
+    .training-loader {
+        display: none;
+        text-align: center;
+        padding: var(--space-xl);
+        color: var(--text-secondary);
+    }
+
+    .training-loader.active {
+        display: block;
+    }
+
+    .loader-animation {
+        width: 50px;
+        height: 50px;
+        border: 3px solid var(--surface-elevated);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto var(--space-lg);
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .viz-controls {
+            grid-template-columns: 1fr;
+        }
+        
+        .model-params {
+            grid-template-columns: 1fr;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .data-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="box">
-    <div class="title-container" style="margin-top: 20px;">
-        <div class="title">Upload and Visualize CSV</div>
+    <div class="title-container">
+        <div class="title">
+            <i class="fas fa-brain"></i>
+            Supervised Learning Interface
+        </div>
+        <div class="subtitle">
+            Upload your dataset, explore data relationships, and train machine learning models with real-time visualization
+        </div>
     </div>
 
-    <div class="main-text">
-        {% if csv_data %}
-        <p class="centered-text">
-            Upload another CSV file to visualize different data. The CSV should be structured with the first row 
-            containing feature names, and the last column containing the output values.
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <h3><i class="fas fa-upload"></i> Data Upload</h3>
+        
+        {% if not csv_data %}
+        <p class="centered-text mb-lg">
+            Upload a CSV file to get started. Your file should have feature columns with the target variable in the last column.
         </p>
         {% else %}
-        <p class="centered-text">
-            Upload a CSV file to visualize the data. The CSV should be structured with the first row 
-            containing feature names, and the last column containing the output values.
+        <p class="centered-text mb-lg">
+            Upload a different CSV file to analyze new data. Current file: <strong>"{{ filename }}"</strong>
         </p>
         {% endif %}
         
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Upload and Visualize</button>
+            <div class="upload-dropzone" id="dropzone">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h4>Drag & Drop your CSV file here</h4>
+                <p>or click to browse files</p>
+                {{ form.file }}
+            </div>
+            <div class="button-container mt-lg">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i>
+                    Upload and Analyze
+                </button>
+            </div>
         </form>
         
         {% if error %}
-            <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        
-        {% if csv_data %}
-            <h3>CSV Data Preview of "{{ filename }}"</h3>
-            <p><em>Showing all {{ row_count }} rows</em></p>
-            
-            <div style="max-height: 300px; overflow-y: auto; overflow-x: auto; margin-bottom: 20px; border: 1px solid #ddd;">
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead style="position: sticky; top: 0; background-color: #f9f9f9;">
-                        <tr>
-                            {% for column in headers %}
-                                <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">{{ column }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in data %}
-                            <tr>
-                                {% for cell in row %}
-                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ cell }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Interactive Visualization Section -->
-            <div style="margin-top: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
-                <h3>Interactive Visualization</h3>
-                
-                <div style="margin-bottom: 20px;">
-                    <label><input type="radio" name="analysis-type" value="classification" checked> Classification</label>
-                </div>
-                
-                <div id="feature-selection" style="margin-bottom: 20px;">
-                    <p><strong>Select features to plot:</strong></p>
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                        <div>
-                            <label for="x-feature">X-axis feature:</label>
-                            <select id="x-feature" class="feature-select">
-                                {% for feature in features %}
-                                    <option value="{{ forloop.counter0 }}">{{ feature }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label for="y-feature">Y-axis feature:</label>
-                            <select id="y-feature" class="feature-select">
-                                {% for feature in features %}
-                                    {% if forloop.counter0 == 1 %}
-                                        <option value="{{ forloop.counter0 }}" selected>{{ feature }}</option>
-                                    {% else %}
-                                        <option value="{{ forloop.counter0 }}">{{ feature }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="width: 100%; height: 400px;">
-                    <canvas id="scatterChart"></canvas>
-                </div>
-            </div>
-
-
-            <!-- Model training -->
-            <div style="margin-top: 40px; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
-                <h3>Train a Machine Learning Model</h3>
-                <form id="train-model-form">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="id_model_type">{{ train_form.model_type.label }}:</label>
-                        {{ train_form.model_type }}
-                        <small class="form-text text-muted">Select the machine learning algorithm to use</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="id_test_size">{{ train_form.test_size.label }}:</label>
-                        {{ train_form.test_size }}
-                        <small class="form-text text-muted">Proportion of the dataset to include in the test split</small>
-                    </div>
-                    
-                    <!-- Random Forest Parameters -->
-                    <div id="rf-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <h4>Random Forest Parameters</h4>
-                        
-                        <div class="form-group">
-                            <label for="id_rf_n_estimators">{{ train_form.rf_n_estimators.label }}:</label>
-                            {{ train_form.rf_n_estimators }}
-                            <small class="form-text text-muted">{{ train_form.rf_n_estimators.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_rf_max_depth">{{ train_form.rf_max_depth.label }}:</label>
-                            {{ train_form.rf_max_depth }}
-                            <small class="form-text text-muted">{{ train_form.rf_max_depth.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_rf_max_features">{{ train_form.rf_max_features.label }}:</label>
-                            {{ train_form.rf_max_features }}
-                            <small class="form-text text-muted">{{ train_form.rf_max_features.help_text }}</small>
-                        </div>
-                    </div>
-                    
-                    <!-- SVM Parameters -->
-                    <div id="svm-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <h4>Support Vector Machine Parameters</h4>
-                        
-                        <div class="form-group">
-                            <label for="id_svm_kernel">{{ train_form.svm_kernel.label }}:</label>
-                            {{ train_form.svm_kernel }}
-                            <small class="form-text text-muted">{{ train_form.svm_kernel.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_svm_C">{{ train_form.svm_C.label }}:</label>
-                            {{ train_form.svm_C }}
-                            <small class="form-text text-muted">{{ train_form.svm_C.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_svm_gamma">{{ train_form.svm_gamma.label }}:</label>
-                            {{ train_form.svm_gamma }}
-                            <small class="form-text text-muted">{{ train_form.svm_gamma.help_text }}</small>
-                        </div>
-                    </div>
-                    
-                    <!-- XGBoost Parameters -->
-                    <div id="xgb-params" class="model-params" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <h4>XGBoost Parameters</h4>
-                        
-                        <div class="form-group">
-                            <label for="id_xgb_n_estimators">{{ train_form.xgb_n_estimators.label }}:</label>
-                            {{ train_form.xgb_n_estimators }}
-                            <small class="form-text text-muted">{{ train_form.xgb_n_estimators.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_xgb_learning_rate">{{ train_form.xgb_learning_rate.label }}:</label>
-                            {{ train_form.xgb_learning_rate }}
-                            <small class="form-text text-muted">{{ train_form.xgb_learning_rate.help_text }}</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_xgb_max_depth">{{ train_form.xgb_max_depth.label }}:</label>
-                            {{ train_form.xgb_max_depth }}
-                            <small class="form-text text-muted">{{ train_form.xgb_max_depth.help_text }}</small>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" style="margin-top: 20px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Train Model</button>
-                </form>
-                
-                <div id="model-result" style="margin-top: 20px;"></div>
-            </div>
-            
-            
-            
-            
-        {% endif %}
-        
-        {% if plots %}
-            <h3>Data Visualization</h3>
-            <div class="visualization-container">
-                {% for plot in plots %}
-                    <img src="data:image/png;base64,{{ plot }}" alt="Data Visualization" style="max-width: 100%; margin-bottom: 20px;">
-                {% endfor %}
-            </div>
+        <div class="alert alert-error mt-lg">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+        </div>
         {% endif %}
     </div>
+
+    {% if csv_data %}
+    <!-- Data Preview Section -->
+    <div class="data-preview">
+        <div class="results-header">
+            <div class="results-icon">
+                <i class="fas fa-table"></i>
+            </div>
+            <div>
+                <h3 class="results-title">Dataset: "{{ filename }}"</h3>
+                <p>Data loaded successfully and ready for analysis</p>
+            </div>
+        </div>
+
+        <!-- Data Statistics -->
+        <div class="data-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ row_count }}</div>
+                <div class="stat-label">Total Rows</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ headers|length }}</div>
+                <div class="stat-label">Features</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ features|length }}</div>
+                <div class="stat-label">Input Features</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ unique_classes|length }}</div>
+                <div class="stat-label">Classes</div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <h4><i class="fas fa-eye"></i> Data Preview</h4>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for column in headers %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        {% for cell in row %}
+                        <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Visualization Section -->
+    <div class="viz-section">
+        <h3><i class="fas fa-chart-scatter"></i> Interactive Data Visualization</h3>
+        
+        <div class="viz-controls">
+            <div class="control-group">
+                <label for="x-feature">X-Axis Feature</label>
+                <select id="x-feature">
+                    {% for feature in features %}
+                    <option value="{{ forloop.counter0 }}">{{ feature }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="y-feature">Y-Axis Feature</label>
+                <select id="y-feature">
+                    {% for feature in features %}
+                    {% if forloop.counter0 == 1 %}
+                    <option value="{{ forloop.counter0 }}" selected>{{ feature }}</option>
+                    {% else %}
+                    <option value="{{ forloop.counter0 }}">{{ feature }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="scatterChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Model Training Section -->
+    <div class="training-section">
+        <h3><i class="fas fa-cogs"></i> Machine Learning Model Training</h3>
+        
+        <form id="train-model-form">
+            {% csrf_token %}
+            
+            <!-- Model Selection Tabs -->
+            <div class="model-tabs">
+                <button type="button" class="model-tab active" data-model="rf">
+                    <i class="fas fa-tree"></i> Random Forest
+                </button>
+                <button type="button" class="model-tab" data-model="svm">
+                    <i class="fas fa-vector-square"></i> SVM
+                </button>
+                <button type="button" class="model-tab" data-model="xgb">
+                    <i class="fas fa-rocket"></i> XGBoost
+                </button>
+            </div>
+
+            <!-- General Parameters -->
+            <div class="param-group mb-lg">
+                <label for="id_test_size">{{ train_form.test_size.label }}</label>
+                {{ train_form.test_size }}
+                <div class="param-help">Proportion of dataset for testing (0.1 to 0.9)</div>
+            </div>
+
+            <!-- Random Forest Parameters -->
+            <div id="rf-params" class="model-params active">
+                <div class="param-group">
+                    <label for="id_rf_n_estimators">{{ train_form.rf_n_estimators.label }}</label>
+                    {{ train_form.rf_n_estimators }}
+                    <div class="param-help">{{ train_form.rf_n_estimators.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_rf_max_depth">{{ train_form.rf_max_depth.label }}</label>
+                    {{ train_form.rf_max_depth }}
+                    <div class="param-help">{{ train_form.rf_max_depth.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_rf_max_features">{{ train_form.rf_max_features.label }}</label>
+                    {{ train_form.rf_max_features }}
+                    <div class="param-help">{{ train_form.rf_max_features.help_text }}</div>
+                </div>
+            </div>
+
+            <!-- SVM Parameters -->
+            <div id="svm-params" class="model-params">
+                <div class="param-group">
+                    <label for="id_svm_kernel">{{ train_form.svm_kernel.label }}</label>
+                    {{ train_form.svm_kernel }}
+                    <div class="param-help">{{ train_form.svm_kernel.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_svm_C">{{ train_form.svm_C.label }}</label>
+                    {{ train_form.svm_C }}
+                    <div class="param-help">{{ train_form.svm_C.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_svm_gamma">{{ train_form.svm_gamma.label }}</label>
+                    {{ train_form.svm_gamma }}
+                    <div class="param-help">{{ train_form.svm_gamma.help_text }}</div>
+                </div>
+            </div>
+
+            <!-- XGBoost Parameters -->
+            <div id="xgb-params" class="model-params">
+                <div class="param-group">
+                    <label for="id_xgb_n_estimators">{{ train_form.xgb_n_estimators.label }}</label>
+                    {{ train_form.xgb_n_estimators }}
+                    <div class="param-help">{{ train_form.xgb_n_estimators.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_xgb_learning_rate">{{ train_form.xgb_learning_rate.label }}</label>
+                    {{ train_form.xgb_learning_rate }}
+                    <div class="param-help">{{ train_form.xgb_learning_rate.help_text }}</div>
+                </div>
+                <div class="param-group">
+                    <label for="id_xgb_max_depth">{{ train_form.xgb_max_depth.label }}</label>
+                    {{ train_form.xgb_max_depth }}
+                    <div class="param-help">{{ train_form.xgb_max_depth.help_text }}</div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-play"></i>
+                    Train Model
+                </button>
+            </div>
+        </form>
+
+        <!-- Training Loader -->
+        <div class="training-loader" id="training-loader">
+            <div class="loader-animation"></div>
+            <h4>Training Model...</h4>
+            <p>Please wait while we train your machine learning model with the selected parameters.</p>
+        </div>
+
+        <!-- Results Display -->
+        <div id="model-result"></div>
+    </div>
+    {% endif %}
+
+    {% if plots %}
+    <!-- Static Visualizations -->
+    <div class="viz-section">
+        <h3><i class="fas fa-chart-area"></i> Statistical Analysis</h3>
+        <div class="visualization-container">
+            {% for plot in plots %}
+            <div class="chart-container mb-xl">
+                <img src="data:image/png;base64,{{ plot }}" alt="Data Visualization" style="max-width: 100%; height: auto;">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -292,26 +650,29 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // JSON data from backend
+    // Data from Django
     const features = {{ features_json|safe }};
     const dataPoints = {{ data_json|safe }};
     const targetClasses = {{ target_classes|safe }};
     const uniqueClasses = {{ unique_classes|safe }};
+    
+    // Modern color palette
     const colorPalette = [
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)',
-        'rgba(255, 159, 64, 0.7)',
-        'rgba(199, 199, 199, 0.7)',
-        'rgba(83, 102, 255, 0.7)',
-        'rgba(40, 159, 64, 0.7)',
-        'rgba(210, 199, 199, 0.7)'
+        'rgba(102, 126, 234, 0.8)',
+        'rgba(240, 147, 251, 0.8)',
+        'rgba(79, 172, 254, 0.8)',
+        'rgba(0, 210, 255, 0.8)',
+        'rgba(255, 138, 128, 0.8)',
+        'rgba(255, 87, 34, 0.8)',
+        'rgba(156, 39, 176, 0.8)',
+        'rgba(103, 58, 183, 0.8)',
+        'rgba(63, 81, 181, 0.8)',
+        'rgba(33, 150, 243, 0.8)'
     ];
     
     let chart;
     
+    // Create scatter plot
     function createChart(xFeatureIndex, yFeatureIndex) {
         const ctx = document.getElementById('scatterChart').getContext('2d');
         
@@ -332,17 +693,20 @@
             }
             
             datasets.push({
-                label: `Class ${classValue}`,
+                label: `${classValue}`,
                 data: points,
                 backgroundColor: colorPalette[i % colorPalette.length],
-                borderColor: colorPalette[i % colorPalette.length].replace('0.7', '1'),
-                borderWidth: 1,
-                pointRadius: 5,
-                pointHoverRadius: 7
+                borderColor: colorPalette[i % colorPalette.length].replace('0.8', '1'),
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: colorPalette[i % colorPalette.length].replace('0.8', '1'),
+                pointHoverBorderWidth: 3,
+                pointHoverBorderColor: '#ffffff'
             });
         }
         
-        // Destroy previous chart if it exists
+        // Destroy previous chart
         if (chart) {
             chart.destroy();
         }
@@ -350,41 +714,85 @@
         // Create new chart
         chart = new Chart(ctx, {
             type: 'scatter',
-            data: {
-                datasets: datasets
-            },
+            data: { datasets: datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: features[xFeatureIndex]
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: features[yFeatureIndex]
-                        }
-                    }
-                },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Classification Visualization',
+                        text: 'Feature Relationship Visualization',
                         font: {
-                            size: 16
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#ffffff'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            color: '#b8bcc8',
+                            font: {
+                                size: 12
+                            }
                         }
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#b8bcc8',
+                        borderColor: 'rgba(102, 126, 234, 0.5)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
                         callbacks: {
                             label: function(context) {
                                 return `${context.dataset.label}: (${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`;
                             }
                         }
                     }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: features[xFeatureIndex],
+                            color: '#ffffff',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: '#8892b0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: features[yFeatureIndex],
+                            color: '#ffffff',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: '#8892b0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'point'
                 }
             }
         });
@@ -400,120 +808,211 @@
         createChart(xFeatureIndex, yFeatureIndex);
     }
     
-    // Initialize chart with default features
+    // Model tab switching
+    document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.model-params').forEach(p => p.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding parameters
+            const model = this.getAttribute('data-model');
+            document.getElementById(`${model}-params`).classList.add('active');
+            
+            // Update hidden field
+            document.getElementById('id_model_type').value = model;
+        });
+    });
+    
+    // Form submission with loading state
+    document.getElementById('train-model-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        const resultContainer = document.getElementById('model-result');
+        const loader = document.getElementById('training-loader');
+        
+        // Show loading state
+        loader.classList.add('active');
+        resultContainer.innerHTML = '';
+        
+        // Add model-specific parameters
+        const activeTab = document.querySelector('.model-tab.active');
+        const modelType = activeTab.getAttribute('data-model');
+        formData.append('model_type', modelType);
+        
+        if (modelType === 'rf') {
+            formData.append('rf_n_estimators', document.getElementById('id_rf_n_estimators').value);
+            formData.append('rf_max_depth', document.getElementById('id_rf_max_depth').value);
+            formData.append('rf_max_features', document.getElementById('id_rf_max_features').value);
+        } else if (modelType === 'svm') {
+            formData.append('svm_kernel', document.getElementById('id_svm_kernel').value);
+            formData.append('svm_C', document.getElementById('id_svm_C').value);
+            formData.append('svm_gamma', document.getElementById('id_svm_gamma').value);
+        } else if (modelType === 'xgb') {
+            formData.append('xgb_n_estimators', document.getElementById('id_xgb_n_estimators').value);
+            formData.append('xgb_learning_rate', document.getElementById('id_xgb_learning_rate').value);
+            formData.append('xgb_max_depth', document.getElementById('id_xgb_max_depth').value);
+        }
+        
+        // Send AJAX request
+        fetch("{% url 'project1:train_model_ajax' %}", {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loader.classList.remove('active');
+            
+            if (data.error) {
+                resultContainer.innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ${data.error}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display results
+            let html = `
+                <div class="results-section">
+                    <div class="results-header">
+                        <div class="results-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div>
+                            <h4 class="results-title">Model Performance Results</h4>
+                            <p>Training completed successfully with ${modelType.toUpperCase()} algorithm</p>
+                        </div>
+                    </div>
+                    
+                    <div class="metrics-grid">
+            `;
+            
+            // Calculate overall metrics
+            let totalPrecision = 0, totalRecall = 0, totalF1 = 0, count = 0;
+            
+            for (let label in data.report) {
+                if (data.report[label].precision !== undefined) {
+                    totalPrecision += data.report[label].precision;
+                    totalRecall += data.report[label].recall;
+                    totalF1 += data.report[label].f1_score;
+                    count++;
+                }
+            }
+            
+            const avgPrecision = (totalPrecision / count).toFixed(2);
+            const avgRecall = (totalRecall / count).toFixed(2);
+            const avgF1 = (totalF1 / count).toFixed(2);
+            
+            html += `
+                        <div class="metric-card">
+                            <div class="metric-label">Average Precision</div>
+                            <div class="metric-value">${avgPrecision}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Average Recall</div>
+                            <div class="metric-value">${avgRecall}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Average F1-Score</div>
+                            <div class="metric-value">${avgF1}</div>
+                        </div>
+                    </div>
+                    
+                    <h4><i class="fas fa-table"></i> Detailed Performance by Class</h4>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            for (let label in data.report) {
+                let metrics = data.report[label];
+                if (metrics.precision !== undefined) {
+                    html += `
+                        <tr>
+                            <td><strong>${label}</strong></td>
+                            <td>${metrics.precision}</td>
+                            <td>${metrics.recall}</td>
+                            <td>${metrics.f1_score}</td>
+                        </tr>
+                    `;
+                }
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            resultContainer.innerHTML = html;
+        })
+        .catch(err => {
+            loader.classList.remove('active');
+            resultContainer.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Network error: ${err.message}
+                </div>
+            `;
+        });
+    });
+    
+    // File upload enhancements
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.querySelector('input[type="file"]');
+    
+    dropzone.addEventListener('click', () => fileInput.click());
+    
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+    
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            // Auto-submit form
+            document.getElementById('uploadForm').submit();
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            const fileName = e.target.files[0].name;
+            dropzone.querySelector('h4').textContent = `Selected: ${fileName}`;
+        }
+    });
+    
+    // Initialize chart
     document.addEventListener('DOMContentLoaded', function() {
         updateChart();
-        
-        // Set up model parameter visibility toggling
-        const modelTypeSelect = document.getElementById('id_model_type');
-        const paramSections = document.querySelectorAll('.model-params');
-        
-        // Initial state based on selected model
-        updateModelParams();
-        
-        // Change event to update visibility
-        modelTypeSelect.addEventListener('change', updateModelParams);
-        
-        function updateModelParams() {
-            // Hide all parameter sections first
-            paramSections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Show the relevant section based on selection
-            const selectedModel = modelTypeSelect.value;
-            if (selectedModel === 'rf') {
-                document.getElementById('rf-params').style.display = 'block';
-            } else if (selectedModel === 'svm') {
-                document.getElementById('svm-params').style.display = 'block';
-            } else if (selectedModel === 'xgb') {
-                document.getElementById('xgb-params').style.display = 'block';
-            }
-        }
     });
-
-
-    //asynchronous call for updating training metrics without loading the page
-    document.getElementById('train-model-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // prevent full page reload
-
-    const form = event.target;
-    const formData = new FormData(form);
-    const resultContainer = document.getElementById('model-result');
-    
-    // Show loading indicator
-    resultContainer.innerHTML = '<p>Training model, please wait...</p>';
-    
-    // Add relevant model parameters to formData based on selected model
-    const modelType = document.getElementById('id_model_type').value;
-    
-    if (modelType === 'rf') {
-        // Add Random Forest specific parameters
-        formData.append('rf_n_estimators', document.getElementById('id_rf_n_estimators').value);
-        formData.append('rf_max_depth', document.getElementById('id_rf_max_depth').value);
-        formData.append('rf_max_features', document.getElementById('id_rf_max_features').value);
-    } 
-    else if (modelType === 'svm') {
-        // Add SVM specific parameters
-        formData.append('svm_kernel', document.getElementById('id_svm_kernel').value);
-        formData.append('svm_C', document.getElementById('id_svm_C').value);
-        formData.append('svm_gamma', document.getElementById('id_svm_gamma').value);
-    }
-    else if (modelType === 'xgb') {
-        // Add XGBoost specific parameters
-        formData.append('xgb_n_estimators', document.getElementById('id_xgb_n_estimators').value);
-        formData.append('xgb_learning_rate', document.getElementById('id_xgb_learning_rate').value);
-        formData.append('xgb_max_depth', document.getElementById('id_xgb_max_depth').value);
-    }
-
-    fetch("{% url 'project1:train_model_ajax' %}", {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            resultContainer.innerHTML = `<p style="color:red;">${data.error}</p>`;
-            return;
-        }
-
-        let html = `
-        <div style="margin-top: 20px; padding: 15px; background-color: #e9f7ef; border-radius: 5px; border-left: 5px solid #28a745;">
-            <h4 style="margin-top: 0;">Model Performance Report</h4>
-            <table border="1" style="margin-top:10px; width: 100%; border-collapse: collapse;">
-                <thead style="background-color: #f2f2f2;">
-                    <tr>
-                        <th style="padding: 8px; text-align: left;">Label</th>
-                        <th style="padding: 8px; text-align: center;">Precision</th>
-                        <th style="padding: 8px; text-align: center;">Recall</th>
-                        <th style="padding: 8px; text-align: center;">F1 Score</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-        
-        for (let label in data.report) {
-            let metrics = data.report[label];
-            html += `<tr>
-                <td style="padding: 8px; text-align: left;">${label}</td>
-                <td style="padding: 8px; text-align: center;">${metrics.precision}</td>
-                <td style="padding: 8px; text-align: center;">${metrics.recall}</td>
-                <td style="padding: 8px; text-align: center;">${metrics.f1_score}</td>
-            </tr>`;
-        }
-        
-        html += `</tbody></table>
-        </div>`;
-        
-        resultContainer.innerHTML = html;
-    })
-    .catch(err => {
-        resultContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-    });
-});
 </script>
 {% endif %}
-{% endblock script %} 
+{% endblock script %}

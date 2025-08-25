@@ -1,55 +1,571 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{%  load static %}
+{% block title %}HCAI Project Hub - Home{% endblock %}
 
 {% block extra_css %}
-        <link rel= "stylesheet" href="{% static 'home/style.css'%}">
+<style>
+    /* Hero Section */
+    .hero {
+        text-align: center;
+        padding: var(--space-2xl) 0;
+        margin-bottom: var(--space-2xl);
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 900;
+        margin-bottom: var(--space-lg);
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-xl);
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+
+    /* Status Cards */
+    .status-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-2xl);
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+    }
+
+    .status-item {
+        text-align: center;
+        padding: var(--space-lg);
+        background: var(--surface-elevated);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .status-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .status-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+        margin-bottom: var(--space-sm);
+    }
+
+    .status-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    /* Students Section */
+    .students-section {
+        margin-bottom: var(--space-2xl);
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: var(--space-xl);
+        color: var(--text-primary);
+    }
+
+    .students-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+    }
+
+    .student-card {
+        background: var(--surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .student-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .student-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-glow);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .student-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .student-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-lg);
+        font-size: 2rem;
+        color: white;
+        font-weight: bold;
+    }
+
+    .student-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .student-id {
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        background: var(--surface-elevated);
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-sm);
+        display: inline-block;
+    }
+
+    /* Projects Section */
+    .projects-section {
+        margin-bottom: var(--space-2xl);
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: var(--space-xl);
+    }
+
+    .project-card {
+        background: var(--surface-elevated);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .project-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-glow);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .project-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .project-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-lg);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .project-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-md);
+    }
+
+    .project-description {
+        color: var(--text-secondary);
+        margin-bottom: var(--space-lg);
+        line-height: 1.6;
+    }
+
+    .project-features {
+        list-style: none;
+        margin-bottom: var(--space-lg);
+        padding: 0;
+    }
+
+    .project-features li {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: var(--space-xs);
+        padding-left: var(--space-md);
+        position: relative;
+    }
+
+    .project-features li::before {
+        content: '•';
+        color: var(--accent);
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+
+    .project-status {
+        display: inline-block;
+        padding: var(--space-xs) var(--space-sm);
+        background: rgba(0, 210, 255, 0.1);
+        color: var(--success);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: var(--space-md);
+    }
+
+    .project-button {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        text-decoration: none;
+        padding: var(--space-md) var(--space-lg);
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .project-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .project-button:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .project-button:hover::before {
+        left: 100%;
+    }
+
+    /* About Section */
+    .about-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-2xl);
+        text-align: center;
+    }
+
+    .about-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .about-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-xl);
+    }
+
+    .tech-stack {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-top: var(--space-xl);
+    }
+
+    .tech-item {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .students-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .project-card {
+            padding: var(--space-lg);
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1 class="hero-title">Human-Centric AI</h1>
+    <p class="hero-subtitle">
+        Exploring the intersection of artificial intelligence and human-centered design through innovative machine learning projects and interactive experiences that put humans at the center of AI development.
+    </p>
+</section>
 
-<div class="box">
-    <div class="title-container">
-        <div class = "title">HCAI project hub</div>
-    </div>
-
-    <div class="main-text">
-    <div class="summary" >
-        <p class="centered-text">This page serves as the central hub for student 
-        projects developed as part of the <strong>Human-Centric Artificial Intelligence</strong> 
-        course, by the following group:</p>
-    </div>
-    
-    <div class="students">
-        <ul class="student-list">
-            {% for student in students %}
-                <li class="student-item">
-                    <span class="student-name">{{ student.name }}</span> –
-                    <span class="student-id">{{ student.matriculation }}</span>
-                </li>
-            {% empty %}
-                <li>No students found.</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    
-    <div class="projects">
-        <h2 style="text-align: center;">Projects</h2>
-        <div class="button-container">
-            {% for project in projects %}
-                <form action="{% url project.url_name %}" method="get" style="margin-bottom: 10px;">
-                    {% csrf_token %}
-                    <button type="submit">{{ project.name }}</button>
-                </form>
-            {% endfor %}
+<!-- Status Section -->
+<section class="status-section">
+    <h2 class="section-title">Project Overview</h2>
+    <div class="status-grid">
+        <div class="status-item">
+            <div class="status-number">5</div>
+            <div class="status-label">Active Projects</div>
+        </div>
+        <div class="status-item">
+            <div class="status-number">1,200+</div>
+            <div class="status-label">Data Points</div>
+        </div>
+        <div class="status-item">
+            <div class="status-number">15</div>
+            <div class="status-label">ML Models</div>
+        </div>
+        <div class="status-item">
+            <div class="status-number">98%</div>
+            <div class="status-label">Accuracy</div>
         </div>
     </div>
-    
+</section>
 
-</div>
+<!-- Team Section -->
+<section class="students-section">
+    <h2 class="section-title">Research Team</h2>
+    <div class="students-grid">
+        {% for student in students %}
+        <div class="student-card">
+            <div class="student-avatar">
+                {{ student.name|first }}
+            </div>
+            <div class="student-name">{{ student.name }}</div>
+            <div class="student-id">{{ student.matriculation }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 
+<!-- Projects Section -->
+<section class="projects-section">
+    <h2 class="section-title">Featured Projects</h2>
+    <div class="projects-grid">
+        <!-- Project 1: Supervised Learning -->
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="project-status">Active</div>
+            <h3 class="project-title">Supervised Learning Interface</h3>
+            <p class="project-description">
+                Interactive machine learning platform for training and evaluating supervised learning models with real-time visualization and parameter tuning.
+            </p>
+            <ul class="project-features">
+                <li>CSV data upload and visualization</li>
+                <li>Multiple ML algorithms (RF, SVM, XGBoost)</li>
+                <li>Real-time parameter optimization</li>
+                <li>Performance metrics dashboard</li>
+                <li>Interactive scatter plot visualization</li>
+            </ul>
+            <a href="{% url 'project1:index' %}" class="project-button">
+                <span>Explore Project</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Project 2: Text Classification -->
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="project-status">Active</div>
+            <h3 class="project-title">Text Classification & Active Learning</h3>
+            <p class="project-description">
+                Advanced NLP pipeline with active learning capabilities for sentiment analysis and text classification with human-in-the-loop improvements.
+            </p>
+            <ul class="project-features">
+                <li>TF-IDF and Bag-of-Words vectorization</li>
+                <li>Active learning strategies implementation</li>
+                <li>Model comparison and evaluation</li>
+                <li>Interactive feedback collection</li>
+                <li>Performance tracking over iterations</li>
+            </ul>
+            <a href="{% url 'project2:index' %}" class="project-button">
+                <span>Explore Project</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Project 3: Explainable AI -->
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="project-status">Active</div>
+            <h3 class="project-title">Explainable AI Dashboard</h3>
+            <p class="project-description">
+                Interpretable machine learning models with interactive sparsity control, featuring decision trees and logistic regression with real-time explanations.
+            </p>
+            <ul class="project-features">
+                <li>Interactive decision tree visualization</li>
+                <li>Sparsity parameter control (λ)</li>
+                <li>Feature correlation analysis</li>
+                <li>Real-time model updates</li>
+                <li>Dual model comparison interface</li>
+            </ul>
+            <a href="{% url 'project3:index' %}" class="project-button">
+                <span>Explore Project</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Project 4: Interactive Games -->
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="project-status">Development</div>
+            <h3 class="project-title">Interactive ML Games</h3>
+            <p class="project-description">
+                Gamified machine learning experiences that make AI concepts accessible through interactive gameplay and educational challenges.
+            </p>
+            <ul class="project-features">
+                <li>Educational game mechanics</li>
+                <li>Progressive difficulty levels</li>
+                <li>Performance tracking system</li>
+                <li>Collaborative learning features</li>
+                <li>Concept reinforcement through play</li>
+            </ul>
+            <a href="#" class="project-button" style="opacity: 0.7; cursor: not-allowed;">
+                <span>Coming Soon</span>
+                <i class="fas fa-clock"></i>
+            </a>
+        </div>
+
+        <!-- Project 5: RLHF -->
+        <div class="project-card">
+            <div class="project-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="project-status">Active</div>
+            <h3 class="project-title">Reinforcement Learning with Human Feedback</h3>
+            <p class="project-description">
+                Advanced RLHF implementation demonstrating human-in-the-loop learning with interactive agent training in a mouse environment.
+            </p>
+            <ul class="project-features">
+                <li>REINFORCE algorithm implementation</li>
+                <li>Human feedback collection interface</li>
+                <li>Bradley-Terry reward modeling</li>
+                <li>Policy comparison and analysis</li>
+                <li>Interactive training environment</li>
+            </ul>
+            <a href="{% url 'project5:index' %}" class="project-button">
+                <span>Explore Project</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <h2 class="section-title">About This Project</h2>
+    <div class="about-content">
+        <p class="about-text">
+            This platform serves as a comprehensive hub for Human-Centric Artificial Intelligence research projects. 
+            Our focus is on creating AI systems that are not only powerful but also interpretable, ethical, and designed 
+            with human needs at their core. Each project demonstrates different aspects of human-AI interaction, from 
+            explainable machine learning to reinforcement learning with human feedback.
+        </p>
+        <p class="about-text">
+            Through interactive interfaces and real-time visualizations, we aim to bridge the gap between complex AI 
+            algorithms and human understanding, making artificial intelligence more accessible and trustworthy.
+        </p>
+        
+        <h3 class="gradient-text" style="margin-bottom: var(--space-lg);">Technology Stack</h3>
+        <div class="tech-stack">
+            <span class="tech-item">Python</span>
+            <span class="tech-item">Django</span>
+            <span class="tech-item">Scikit-learn</span>
+            <span class="tech-item">PyTorch</span>
+            <span class="tech-item">XGBoost</span>
+            <span class="tech-item">Pandas</span>
+            <span class="tech-item">NumPy</span>
+            <span class="tech-item">Matplotlib</span>
+            <span class="tech-item">Seaborn</span>
+            <span class="tech-item">JavaScript</span>
+            <span class="tech-item">Chart.js</span>
+            <span class="tech-item">CSS3</span>
+        </div>
+    </div>
+</section>
 {% endblock %}
-
-{% block script %}
-{% endblock script %}
