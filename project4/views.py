@@ -587,3 +587,51 @@ def project4_export_feedback(request):
         ])
     
     return response
+
+
+def project4_analytics(request):
+    """
+    Analytics dashboard for Project 4 - Movie Recommender Study
+    """
+    try:
+        # Get all feedback data
+        feedbacks = Feedback.objects.all()
+        total_submissions = feedbacks.count()
+        
+        # Calculate helpfulness statistics
+        helpfulness_counts = {}
+        for feedback in feedbacks:
+            helpfulness = feedback.helpfulness
+            helpfulness_counts[helpfulness] = helpfulness_counts.get(helpfulness, 0) + 1
+        
+        # Most popular movies (movies that were tested most)
+        movie_counts = {}
+        for feedback in feedbacks:
+            movie = feedback.movie_title
+            movie_counts[movie] = movie_counts.get(movie, 0) + 1
+        
+        popular_movies = sorted(movie_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        # Recent activity
+        recent_feedback = feedbacks.order_by('-submitted_at')[:10]
+        
+        context = {
+            'page_title': 'Project 4 Analytics',
+            'total_submissions': total_submissions,
+            'helpfulness_counts': helpfulness_counts,
+            'popular_movies': popular_movies,
+            'recent_feedback': recent_feedback,
+        }
+        
+    except Exception as e:
+        # Fallback context if there are any issues (e.g., no database entries yet)
+        context = {
+            'page_title': 'Project 4 Analytics',
+            'total_submissions': 0,
+            'helpfulness_counts': {},
+            'popular_movies': [],
+            'recent_feedback': [],
+            'error': str(e)
+        }
+    
+    return render(request, 'project4/analytics.html', context)
