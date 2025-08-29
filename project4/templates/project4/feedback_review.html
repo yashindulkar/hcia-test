@@ -4,51 +4,51 @@
 {% block content %}
 <div class="box">
     <div class="title-container" style="text-align: center; margin-bottom: 30px;">
-        <h2 style="font-size: 26px; color: #4f7ecb;">📋 Detailed Feedback Review</h2>
-        <p style="color: #666;">Complete feedback data from all study participants</p>
+        <h2 style="font-size: 26px; color: #2c3e50; margin-bottom: 10px;">📋 Detailed Feedback Review</h2>
+        <p style="color: #6c757d; font-size: 16px;">Complete feedback data from all study participants</p>
     </div>
 
     <div class="main-text" style="max-width: 1200px; margin: 0 auto;">
         <!-- Summary Stats -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #1976d2;">{{ feedbacks|length }}</div>
-                <div style="color: #666;">Total Responses</div>
+            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: #1976d2;">{{ feedbacks|length }}</div>
+                <div style="color: #2c3e50; font-weight: 500;">Total Responses</div>
             </div>
             
-            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #2e7d32;">
+            <div style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: #2e7d32;">
                     {% for feedback in feedbacks %}
                         {% if feedback.helpfulness == "very_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
                     {% empty %}0{% endfor %}
                 </div>
-                <div style="color: #666;">Very Helpful</div>
+                <div style="color: #2c3e50; font-weight: 500;">Very Helpful</div>
             </div>
             
-            <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #f57c00;">
+            <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: #f57c00;">
                     {% for feedback in feedbacks %}
                         {% if feedback.helpfulness == "somewhat_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
                     {% empty %}0{% endfor %}
                 </div>
-                <div style="color: #666;">Somewhat Helpful</div>
+                <div style="color: #2c3e50; font-weight: 500;">Somewhat Helpful</div>
             </div>
             
-            <div style="background: #ffebee; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #d32f2f;">
+            <div style="background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: #d32f2f;">
                     {% for feedback in feedbacks %}
                         {% if feedback.helpfulness == "not_helpful" %}{{ forloop.counter0|add:1 }}{% endif %}
                     {% empty %}0{% endfor %}
                 </div>
-                <div style="color: #666;">Not Helpful</div>
+                <div style="color: #2c3e50; font-weight: 500;">Not Helpful</div>
             </div>
         </div>
 
         <!-- Filter and Search -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #dee2e6;">
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <div>
-                    <label for="helpfulnessFilter" style="font-weight: bold; margin-right: 10px;">Filter by helpfulness:</label>
+                    <label for="helpfulnessFilter" style="font-weight: bold; margin-right: 10px; color: #2c3e50;">Filter by helpfulness:</label>
                     <select id="helpfulnessFilter" onchange="filterFeedback()" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="">All responses</option>
                         <option value="very_helpful">Very Helpful</option>
@@ -58,7 +58,7 @@
                 </div>
                 
                 <div>
-                    <label for="movieSearch" style="font-weight: bold; margin-right: 10px;">Search movies:</label>
+                    <label for="movieSearch" style="font-weight: bold; margin-right: 10px; color: #2c3e50;">Search movies:</label>
                     <input type="text" id="movieSearch" placeholder="Type movie name..." 
                            onkeyup="filterFeedback()" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px;">
                 </div>
@@ -72,7 +72,7 @@
         </div>
 
         <!-- Feedback Table -->
-        <div style="background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto;">
+        <div style="background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-x: auto; border: 1px solid #dee2e6;">
             <table id="feedbackTable" style="width: 100%; border-collapse: collapse; min-width: 800px;">
                 <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                     <tr>
@@ -98,9 +98,9 @@
                         data-movie="{{ feedback.movie_title|lower }}"
                         style="border-bottom: 1px solid #eee; {% if forloop.counter0|divisibleby:2 %}background-color: #f8f9fa;{% endif %} transition: background-color 0.2s;">
                         <td style="padding: 12px; font-weight: 500;">
-                            <div style="font-size: 14px; color: #333;">{{ feedback.movie_title }}</div>
+                            <div style="font-size: 14px; color: #2c3e50;">{{ feedback.movie_title }}</div>
                             {% if feedback.movie_title|length > 50 %}
-                            <div style="font-size: 12px; color: #666; margin-top: 2px;">{{ feedback.movie_title|truncatechars:50 }}</div>
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 2px;">{{ feedback.movie_title|truncatechars:50 }}</div>
                             {% endif %}
                         </td>
                         <td style="padding: 12px; text-align: center;">
@@ -135,8 +135,8 @@
                     <tr>
                         <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
                             <div style="font-size: 48px; margin-bottom: 15px;">📝</div>
-                            <div style="font-size: 18px; margin-bottom: 5px;">No feedback submitted yet</div>
-                            <div style="font-size: 14px;">Responses will appear here as participants complete the study</div>
+                            <div style="font-size: 18px; margin-bottom: 5px; color: #2c3e50;">No feedback submitted yet</div>
+                            <div style="font-size: 14px; color: #6c757d;">Responses will appear here as participants complete the study</div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -145,19 +145,20 @@
             
             <!-- Show filtered results info -->
             <div id="filterInfo" style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 4px; text-align: center; display: none;">
-                <span id="filteredCount">0</span> of {{ feedbacks|length }} responses shown
+                <span id="filteredCount" style="color: #2c3e50; font-weight: 500;">0</span> 
+                <span style="color: #6c757d;">of {{ feedbacks|length }} responses shown</span>
             </div>
         </div>
 
         <!-- Navigation -->
         <div style="text-align: center; margin-top: 30px;">
-            <a href="{% url 'project4:index' %}" style="display: inline-block; padding: 12px 24px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 6px; margin-right: 10px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#5a6268'" onmouseout="this.style.backgroundColor='#6c757d'">
+            <a href="{% url 'project4:index' %}" style="display: inline-block; padding: 12px 24px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; margin-right: 10px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onmouseover="this.style.backgroundColor='#5a6268'; this.style.transform='translateY(-1px)'" onmouseout="this.style.backgroundColor='#6c757d'; this.style.transform='translateY(0)'">
                 🏠 Back to Home
             </a>
-            <a href="{% url 'project4:analytics' %}" style="display: inline-block; padding: 12px 24px; background-color: #667eea; color: white; text-decoration: none; border-radius: 6px; margin-right: 10px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#5a6fd8'" onmouseout="this.style.backgroundColor='#667eea'">
+            <a href="{% url 'project4:analytics' %}" style="display: inline-block; padding: 12px 24px; background-color: #667eea; color: white; text-decoration: none; border-radius: 8px; margin-right: 10px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onmouseover="this.style.backgroundColor='#5a6fd8'; this.style.transform='translateY(-1px)'" onmouseout="this.style.backgroundColor='#667eea'; this.style.transform='translateY(0)'">
                 📊 View Analytics
             </a>
-            <a href="{% url 'project4:export_feedback' %}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 6px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
+            <a href="{% url 'project4:export_feedback' %}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 8px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onmouseover="this.style.backgroundColor='#218838'; this.style.transform='translateY(-1px)'" onmouseout="this.style.backgroundColor='#28a745'; this.style.transform='translateY(0)'">
                 📥 Export Data (CSV)
             </a>
         </div>
@@ -299,10 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         row.addEventListener('mouseleave', function() {
             const isEven = Array.from(this.parentElement.children).indexOf(this) % 2 === 0;
-            this.style.backgroundColor = isEven ? '#f8f9fa' : '';
+            this.style.backgroundColor = isEven ? '#f8f9fa' : '#ffffff';
         });
     });
 });
 </script>
 {% endblock %}
-

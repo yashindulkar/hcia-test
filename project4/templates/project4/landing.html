@@ -70,7 +70,7 @@
         <div class="card-body">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg);">
                 
-                <!-- Recommender Study Demo -->
+                <!-- Movie Recommender Study Demo -->
                 <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                     <div style="font-size: 3rem; margin-bottom: var(--space-md); background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                         <i class="fas fa-film"></i>
@@ -83,30 +83,43 @@
                     </a>
                 </div>
 
-                <!-- Algorithm Playground -->
-                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease; opacity: 0.7;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--text-muted);">
-                        <i class="fas fa-cogs"></i>
+                <!-- Analytics Dashboard -->
+                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--success);">
+                        <i class="fas fa-chart-bar"></i>
                     </div>
-                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-md);">Algorithm Playground</h3>
-                    <p style="color: var(--text-muted); margin-bottom: var(--space-lg);">Interactive environment for experimenting with different ML algorithms and parameters.</p>
-                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; cursor: not-allowed;" disabled>
-                        <i class="fas fa-clock"></i>
-                        Coming Soon
-                    </button>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">Analytics Dashboard</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">View study participation metrics, user feedback analysis, and recommendation performance data.</p>
+                    <a href="{% url 'project4:analytics' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-chart-line"></i>
+                        View Analytics
+                    </a>
                 </div>
 
-                <!-- Learning Challenges -->
-                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease; opacity: 0.7;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--text-muted);">
-                        <i class="fas fa-trophy"></i>
+                <!-- Feedback Review -->
+                <div style="background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-md); color: var(--warning);">
+                        <i class="fas fa-comments"></i>
                     </div>
-                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-md);">Learning Challenges</h3>
-                    <p style="color: var(--text-muted); margin-bottom: var(--space-lg);">Competitive challenges and leaderboards to test ML knowledge and problem-solving skills.</p>
-                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; cursor: not-allowed;" disabled>
-                        <i class="fas fa-clock"></i>
-                        Coming Soon
-                    </button>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">Feedback Review</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">Review detailed participant feedback, comments, and study completion data.</p>
+                    <a href="{% url 'project4:feedback_review' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-clipboard-list"></i>
+                        Review Feedback
+                    </a>
+                </div>
+
+                <!-- PDF Download - ENHANCED VERSION -->
+                <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border-radius: var(--radius-xl); padding: var(--space-lg); text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3); border: 2px solid rgba(220, 53, 69, 0.2);" onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(220, 53, 69, 0.5)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(220, 53, 69, 0.3)'">
+                    <div style="font-size: 3.5rem; margin-bottom: var(--space-md); text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-md); font-size: 20px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">Research Documentation</h3>
+                    <p style="margin-bottom: var(--space-lg); opacity: 0.95; font-size: 14px; line-height: 1.5;">Download comprehensive PDF documentation of methodology, user study design, and implementation details.</p>
+                    <a href="{% url 'project4:download' %}" style="display: inline-block; padding: 14px 28px; background: rgba(255,255,255,0.25); color: white; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.2s; border: 2px solid rgba(255,255,255,0.4); font-size: 15px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); width: 100%; box-sizing: border-box;" onmouseover="this.style.background='rgba(255,255,255,0.35)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='scale(1)'">
+                        <i class="fas fa-download" style="margin-right: 8px;"></i>
+                        Download PDF
+                    </a>
                 </div>
             </div>
         </div>
