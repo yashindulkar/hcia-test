@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-<!-- Project 4 Study Interface - Complete version -->
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px; width: 100%; box-sizing: border-box;">
     
     <!-- Header with Navigation Tabs -->
@@ -25,14 +24,6 @@
                     style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s; text-decoration: none; display: inline-block;">
                 📋 Feedback
             </a>
-            <button onclick="showTab('insights')" id="insightsTab" class="tab-btn" 
-                    style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s;">
-                🎬 Insights
-            </button>
-            <button onclick="showTab('journey')" id="journeyTab" class="tab-btn" 
-                    style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s;">
-                🚀 User Journey
-            </button>
         </div>
     </div>
 
@@ -43,10 +34,10 @@
     </div>
     {% endif %}
 
-    <!-- TAB 1: STUDY INTERFACE -->
+    <!-- STUDY INTERFACE -->
     <div id="studyContent" class="tab-content" style="max-width: 1200px; margin: 0 auto;">
         
-        <!-- Feedback Success Message - Only show in study tab -->
+        <!-- Feedback Success Message -->
         {% if feedback_submitted %}
         <div id="feedbackSuccessMessage" style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; text-align: center; border-radius: 6px; margin-bottom: 20px; transition: opacity 0.5s ease-out;">
             ✅ Thank you for your feedback!
@@ -82,7 +73,7 @@
                         </div>
                     </div>
                     
-                    <!-- Movie Dropdown - FIXED VISIBILITY -->
+                    <!-- Movie Dropdown -->
                     <select name="movie_title" id="movie_title" required
                             style="width: 100% !important; max-width: 400px !important; padding: 12px !important; font-size: 14px !important; border: 2px solid #ddd !important; border-radius: 6px !important; margin-bottom: 15px !important; background-color: #ffffff !important; color: #2c3e50 !important; font-weight: 500 !important;">
                         <option value="" disabled {% if not movie_title %}selected{% endif %}
@@ -97,46 +88,73 @@
                         {% endfor %}
                     </select>
                     
-                    <!-- Popular Movies Quick Select -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-size: 14px; color: #495057; margin-bottom: 10px;">🌟 Popular Choices:</div>
-                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
-                            {% for title in all_titles|slice:":6" %}
-                            <button type="button" onclick="selectMovie('{{ title }}')" 
-                                    style="color: #333; padding: 8px 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 15px; font-size: 12px; cursor: pointer; transition: all 0.2s;">
-                                {{ title|truncatechars:20 }}
-                            </button>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
+                    <br>
                     <button type="submit" style="padding: 15px 30px; background-color: #4a78c2; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                         <span>Analyze Impact</span>
                     </button>
                 </div>
             </form>
 
-            <!-- IMPROVED PREDICTION IMPACT LAYOUT -->
+            <!-- PREDICTION IMPACT RESULTS -->
             {% if prediction_impact %}
             <div style="margin: 0 auto; width: 100%;">
                 
-                <!-- Row 1: Chart and Recommendations -->
+                <!-- Chart and Recommendations Row -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; max-width: 100%;">
                     
-                    <!-- Chart Section - Larger and more prominent -->
+                    <!-- Chart Section - SIMPLIFIED VERSION -->
                     <div style="background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
                         <h3 style="text-align: center; color: #4f7ecb; margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #4f7ecb; padding-bottom: 10px;">
                             📊 Your Rating Impact
                         </h3>
-                        <div style="text-align: center; margin-bottom: 15px;">
-                            <canvas id="recommendationChart" width="400" height="300" style="display: block; margin: 0 auto;"></canvas>
+                        
+                        <!-- Simple Visual Chart -->
+                        <div style="background: #f8f9fa; padding: 30px 20px; border-radius: 8px; margin-bottom: 15px;">
+                            <!-- Chart Title -->
+                            <div style="text-align: center; margin-bottom: 25px; font-weight: bold; color: #4f7ecb; font-size: 14px;">
+                                Number of Recommendations by Rating
+                            </div>
+                            
+                            <!-- Visual Bars -->
+                            <div style="display: flex; justify-content: center; align-items: end; gap: 30px; height: 180px; padding: 0 20px;">
+                                
+                                <!-- 1 Star -->
+                                <div style="text-align: center;">
+                                    <div style="background: #f44336; width: 45px; height: {{ prediction_impact.1_stars|length }}0px; max-height: 140px; min-height: 30px; border-radius: 4px 4px 0 0; margin: 0 auto 10px auto; display: flex; align-items: start; justify-content: center; padding-top: 8px; color: white; font-weight: bold; font-size: 13px; box-shadow: 0 3px 6px rgba(244,67,54,0.3);">
+                                        {{ prediction_impact.1_stars|length }}
+                                    </div>
+                                    <div style="font-size: 11px; color: #2c3e50; font-weight: 600;">1⭐</div>
+                                </div>
+                                
+                                <!-- 3 Stars -->
+                                <div style="text-align: center;">
+                                    <div style="background: #ff9800; width: 45px; height: {{ prediction_impact.3_stars|length }}0px; max-height: 140px; min-height: 30px; border-radius: 4px 4px 0 0; margin: 0 auto 10px auto; display: flex; align-items: start; justify-content: center; padding-top: 8px; color: white; font-weight: bold; font-size: 13px; box-shadow: 0 3px 6px rgba(255,152,0,0.3);">
+                                        {{ prediction_impact.3_stars|length }}
+                                    </div>
+                                    <div style="font-size: 11px; color: #2c3e50; font-weight: 600;">3⭐</div>
+                                </div>
+                                
+                                <!-- 5 Stars -->
+                                <div style="text-align: center;">
+                                    <div style="background: #2196f3; width: 45px; height: {{ prediction_impact.5_stars|length }}0px; max-height: 140px; min-height: 30px; border-radius: 4px 4px 0 0; margin: 0 auto 10px auto; display: flex; align-items: start; justify-content: center; padding-top: 8px; color: white; font-weight: bold; font-size: 13px; box-shadow: 0 3px 6px rgba(33,150,243,0.3);">
+                                        {{ prediction_impact.5_stars|length }}
+                                    </div>
+                                    <div style="font-size: 11px; color: #2c3e50; font-weight: 600;">5⭐</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Summary Stats -->
+                            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 12px; color: #666;">
+                                <span>Total: {{ prediction_impact.1_stars|length|add:prediction_impact.3_stars|length|add:prediction_impact.5_stars|length }} recommendations</span>
+                            </div>
                         </div>
+                        
                         <p style="text-align: center; color: #6c757d; font-size: 14px; margin: 0; font-style: italic;">
                             See how different ratings change your recommendations
                         </p>
                     </div>
 
-                    <!-- Recommendations Section - Better organized -->
+                    <!-- Recommendations Section -->
                     <div style="background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
                         <h3 style="text-align: center; color: #4f7ecb; margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #4f7ecb; padding-bottom: 10px;">
                             🎯 Recommendations by Rating
@@ -175,7 +193,7 @@
                     </div>
                 </div>
 
-                <!-- Row 2: Feedback Section - Full width for better experience -->
+                <!-- Feedback Section -->
                 <div style="background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); max-width: 100%;">
                     <h3 style="text-align: center; color: #4f7ecb; margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #4f7ecb; padding-bottom: 10px;">
                         💬 Share Your Experience
@@ -185,10 +203,9 @@
                         {% csrf_token %}
                         <input type="hidden" name="movie_title" value="{{ movie_title }}">
                         
-                        <!-- Two-column form layout -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                             
-                            <!-- Helpfulness Rating - FIXED DROPDOWN -->
+                            <!-- Helpfulness Rating -->
                             <div>
                                 <label for="feedback" style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">
                                     How helpful was this visualization?
@@ -237,15 +254,8 @@
                         <!-- Submit Button -->
                         <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef;">
                             <button type="submit" name="submit_feedback" value="1" 
-                                    style="padding: 14px 24px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); width: auto; max-width: 280px; position: relative; overflow: hidden; white-space: nowrap;"
-                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(40, 167, 69, 0.4)'"
-                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(40, 167, 69, 0.3)'"
-                                    onmousedown="this.style.transform='translateY(1px)'"
-                                    onmouseup="this.style.transform='translateY(-2px)'">
-                                <span style="display: inline-flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 18px;">📝</span>
-                                    <span>Submit Your Feedback</span>
-                                </span>
+                                    style="padding: 14px 24px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);">
+                                <span>📝 Submit Your Feedback</span>
                             </button>
                         </div>
                     </form>
@@ -270,87 +280,11 @@
         </div>
     </div>
 
-    <!-- TAB 4: MOVIE INSIGHTS -->
-    <div id="insightsContent" class="tab-content" style="display: none; max-width: 1200px; margin: 0 auto;">
-        <div style="background: #fff; padding: 25px; border-radius: 8px;">
-            <h3 style="margin: 0 0 20px 0; text-align: center; color: #2c3e50;">🎬 Popular Movies</h3>
-            {% for movie in popular_test_movies|slice:":5" %}
-            <div style="padding: 12px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 500; color: #2c3e50;">{{ movie.movie_title }}</span>
-                <span style="background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">
-                    {{ movie.count }} test{{ movie.count|pluralize }}
-                </span>
-            </div>
-            {% empty %}
-            <p style="text-align: center; color: #6c757d; margin: 40px 0;">No movie data available yet.</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- TAB 5: USER JOURNEY -->
-    <div id="journeyContent" class="tab-content" style="display: none; max-width: 1200px; margin: 0 auto;">
-        <div style="background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 20px 0; text-align: center; color: #2c3e50;">🚀 User Journey Analytics</h3>
-            
-            <!-- Engagement Overview -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 28px; font-weight: bold;">{{ active_sessions|default:0 }}</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Active Sessions</div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 28px; font-weight: bold;">{{ comment_rate|default:0 }}%</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Comment Rate</div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, #fd9644 0%, #f7931e 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 28px; font-weight: bold;">{{ avg_comment_length|default:0 }}</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Avg Comment Length</div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 28px; font-weight: bold;">{{ total_submissions|default:0 }}</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Total Responses</div>
-                </div>
-            </div>
-
-            <p style="text-align: center; color: #6c757d;">More detailed analytics coming soon...</p>
-        </div>
-    </div>
-
 </div>
 
-<!-- CRITICAL: CSS Fixes for Dropdown Visibility -->
+<!-- CSS Fixes -->
 <style>
-/* Fix for dropdown text visibility issues */
-select#movie_title {
-    width: 100% !important; 
-    max-width: 400px !important; 
-    padding: 12px !important; 
-    font-size: 14px !important; 
-    border: 2px solid #ddd !important; 
-    border-radius: 6px !important; 
-    margin-bottom: 15px !important;
-    background-color: #ffffff !important;
-    color: #2c3e50 !important;
-    font-weight: 500 !important;
-}
-
-select#movie_title option {
-    background-color: #ffffff !important;
-    color: #2c3e50 !important;
-    padding: 8px 12px !important;
-    font-size: 14px !important;
-    font-weight: normal !important;
-}
-
-select#movie_title option[disabled] {
-    background-color: #f8f9fa !important;
-    color: #6c757d !important;
-    font-style: italic !important;
-}
-
+select#movie_title,
 select#feedback {
     width: 100% !important; 
     padding: 12px !important; 
@@ -362,6 +296,7 @@ select#feedback {
     font-weight: 500 !important;
 }
 
+select#movie_title option,
 select#feedback option {
     background-color: #ffffff !important;
     color: #2c3e50 !important;
@@ -369,13 +304,13 @@ select#feedback option {
     font-size: 14px !important;
 }
 
+select#movie_title option[disabled],
 select#feedback option[disabled] {
     background-color: #f8f9fa !important;
     color: #6c757d !important;
     font-style: italic !important;
 }
 
-/* Dark mode override to ensure visibility */
 @media (prefers-color-scheme: dark) {
     select#movie_title,
     select#feedback {
@@ -390,7 +325,6 @@ select#feedback option[disabled] {
     }
 }
 
-/* Focus states for better UX */
 select#movie_title:focus,
 select#feedback:focus {
     outline: none !important;
@@ -398,43 +332,21 @@ select#feedback:focus {
     box-shadow: 0 0 0 0.2rem rgba(79, 126, 203, 0.25) !important;
 }
 
-/* Hover states */
-select#movie_title:hover,
-select#feedback:hover {
-    border-color: #4f7ecb !important;
-}
-</style>
-{% endblock %}
-
-{% block script %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-// Tab Management
-function showTab(tabName) {
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-        content.style.display = 'none';
-    });
-
-    // Remove active class from all tab buttons
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(button => {
-        button.style.background = 'rgba(255,255,255,0.1)';
-        button.classList.remove('active');
-    });
-
-    // Show selected tab content
-    document.getElementById(tabName + 'Content').style.display = 'block';
-
-    // Activate selected tab button
-    const activeButton = document.getElementById(tabName + 'Tab');
-    if (activeButton) {
-        activeButton.style.background = 'rgba(255,255,255,0.2)';
-        activeButton.classList.add('active');
+@media (max-width: 768px) {
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
     }
 }
+
+/* Chart Hover Effects */
+.chart-bar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+</style>
+
+<script>
+console.log('Script block loaded - No external dependencies');
 
 // Movie Selection Functions
 function selectMovie(movieTitle) {
@@ -451,12 +363,11 @@ function filterMovies() {
         return;
     }
     
-    // Filter options
     const options = movieSelect.querySelectorAll('option');
     let firstMatch = null;
     
     options.forEach(option => {
-        if (option.value === '') return; // Skip placeholder
+        if (option.value === '') return;
         
         const movieTitle = option.value.toLowerCase();
         if (movieTitle.includes(searchTerm)) {
@@ -469,139 +380,15 @@ function filterMovies() {
         }
     });
     
-    // Auto-select first match if available
     if (firstMatch) {
         movieSelect.value = firstMatch.value;
     }
 }
 
-// Chart for Recommendation Impact
-{% if prediction_impact %}
-function initializeRecommendationChart() {
-    const ctx = document.getElementById('recommendationChart');
-    if (!ctx) return;
-
-    const chartData = {
-        labels: ['1 Star', '3 Stars', '5 Stars'],
-        datasets: [{
-            label: 'Number of Recommendations',
-            data: [
-                {{ prediction_impact.1_stars|length }},
-                {{ prediction_impact.3_stars|length }},
-                {{ prediction_impact.5_stars|length }}
-            ],
-            backgroundColor: [
-                'rgba(244, 67, 54, 0.8)',   // Red for 1 star
-                'rgba(255, 152, 0, 0.8)',   // Orange for 3 stars  
-                'rgba(33, 150, 243, 0.8)'   // Blue for 5 stars
-            ],
-            borderColor: [
-                'rgba(244, 67, 54, 1)',
-                'rgba(255, 152, 0, 1)',
-                'rgba(33, 150, 243, 1)'
-            ],
-            borderWidth: 2,
-            borderRadius: 8,
-            borderSkipped: false,
-        }]
-    };
-
-    const config = {
-        type: 'bar',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Rating Impact on Recommendations',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    padding: {
-                        top: 5,
-                        bottom: 20
-                    },
-                    color: '#4f7ecb'
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: 'white',
-                    bodyColor: 'white',
-                    cornerRadius: 6,
-                    displayColors: true,
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.parsed.y} recommendations for ${context.label}`;
-                        }
-                    }
-                },
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Recommendations',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        },
-                        color: '#6c757d'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        stepSize: 1,
-                        color: '#6c757d'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Your Rating',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        },
-                        color: '#6c757d'
-                    },
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#6c757d'
-                    }
-                }
-            },
-            animation: {
-                duration: 800,
-                easing: 'easeInOutQuart'
-            }
-        }
-    };
-
-    new Chart(ctx, config);
-}
-
-// Initialize recommendation chart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initializeRecommendationChart();
-});
-{% endif %}
-
 // Auto-dismiss feedback message
 document.addEventListener('DOMContentLoaded', function() {
     const feedbackMessage = document.getElementById('feedbackSuccessMessage');
     if (feedbackMessage) {
-        // Auto-dismiss after 4 seconds
         setTimeout(function() {
             feedbackMessage.style.opacity = '0';
             setTimeout(function() {
@@ -609,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }, 4000);
         
-        // Also allow manual dismiss by clicking
         feedbackMessage.addEventListener('click', function() {
             this.style.opacity = '0';
             setTimeout(() => {
@@ -621,11 +407,31 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackMessage.title = 'Click to dismiss';
     }
     
+    // Add hover effects to chart bars
+    const chartBars = document.querySelectorAll('[style*="background: linear-gradient(to top"]');
+    chartBars.forEach(bar => {
+        bar.classList.add('chart-bar');
+        bar.style.cursor = 'pointer';
+        
+        bar.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        });
+        
+        bar.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 2px 4px ' + (
+                this.style.background.includes('#f44336') ? 'rgba(244, 67, 54, 0.3)' :
+                this.style.background.includes('#ff9800') ? 'rgba(255, 152, 0, 0.3)' :
+                'rgba(33, 150, 243, 0.3)'
+            );
+        });
+    });
+    
     // Enhanced form interactions
     const movieSelect = document.getElementById('movie_title');
     const searchInput = document.getElementById('movieSearch');
     const feedbackSelect = document.getElementById('feedback');
-    const commentsTextarea = document.getElementById('comments');
     
     if (movieSelect) {
         movieSelect.addEventListener('focus', function() {
@@ -662,60 +468,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.boxShadow = 'none';
         });
     }
-    
-    if (commentsTextarea) {
-        commentsTextarea.addEventListener('focus', function() {
-            this.style.borderColor = '#28a745';
-            this.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
-        });
-        
-        commentsTextarea.addEventListener('blur', function() {
-            this.style.borderColor = '#ddd';
-            this.style.boxShadow = 'none';
-        });
-    }
-
-    // Popular movie buttons hover effects
-    const popularButtons = document.querySelectorAll('button[onclick^="selectMovie"]');
-    popularButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            this.style.background = '#e9ecef';
-            this.style.transform = 'translateY(-1px)';
-        });
-        
-        button.addEventListener('mouseleave', function() {
-            this.style.background = '#f8f9fa';
-            this.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Tab button hover effects
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            if (!this.classList.contains('active')) {
-                this.style.background = 'rgba(255,255,255,0.15)';
-            }
-        });
-        
-        button.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('active')) {
-                this.style.background = 'rgba(255,255,255,0.1)';
-            }
-        });
-    });
-    
-    // Tab link hover effects
-    const tabLinks = document.querySelectorAll('.tab-link');
-    tabLinks.forEach(link => {
-        link.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255,255,255,0.15)';
-        });
-        
-        link.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255,255,255,0.1)';
-        });
-    });
 });
+
+console.log('Script completed successfully');
 </script>
 {% endblock %}
