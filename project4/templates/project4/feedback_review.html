@@ -49,11 +49,12 @@
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <div>
                     <label for="helpfulnessFilter" style="font-weight: bold; margin-right: 10px; color: #2c3e50;">Filter by helpfulness:</label>
-                    <select id="helpfulnessFilter" onchange="filterFeedback()" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">All responses</option>
-                        <option value="very_helpful">Very Helpful</option>
-                        <option value="somewhat_helpful">Somewhat Helpful</option>
-                        <option value="not_helpful">Not Helpful</option>
+                    <select id="helpfulnessFilter" onchange="filterFeedback()" 
+                            style="padding: 8px 12px !important; border: 1px solid #ddd !important; border-radius: 4px !important; background-color: #ffffff !important; color: #2c3e50 !important; font-size: 14px !important; font-weight: 500 !important;">
+                        <option value="" style="background-color: #ffffff !important; color: #2c3e50 !important;">All responses</option>
+                        <option value="very_helpful" style="background-color: #ffffff !important; color: #2c3e50 !important;">Very Helpful</option>
+                        <option value="somewhat_helpful" style="background-color: #ffffff !important; color: #2c3e50 !important;">Somewhat Helpful</option>
+                        <option value="not_helpful" style="background-color: #ffffff !important; color: #2c3e50 !important;">Not Helpful</option>
                     </select>
                 </div>
                 
@@ -164,6 +165,52 @@
         </div>
     </div>
 </div>
+
+<!-- CRITICAL: CSS Fixes for Dropdown Visibility -->
+<style>
+/* Fix for helpfulness filter dropdown text visibility */
+select#helpfulnessFilter {
+    padding: 8px 12px !important; 
+    border: 1px solid #ddd !important; 
+    border-radius: 4px !important;
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+select#helpfulnessFilter option {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+}
+
+/* Dark mode override to ensure visibility */
+@media (prefers-color-scheme: dark) {
+    select#helpfulnessFilter {
+        background-color: #ffffff !important;
+        color: #2c3e50 !important;
+    }
+    
+    select#helpfulnessFilter option {
+        background-color: #ffffff !important;
+        color: #2c3e50 !important;
+    }
+}
+
+/* Focus states for better UX */
+select#helpfulnessFilter:focus {
+    outline: none !important;
+    border-color: #4f7ecb !important;
+    box-shadow: 0 0 0 0.2rem rgba(79, 126, 203, 0.25) !important;
+}
+
+/* Hover states */
+select#helpfulnessFilter:hover {
+    border-color: #4f7ecb !important;
+}
+</style>
 {% endblock %}
 
 {% block script %}

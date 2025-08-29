@@ -82,11 +82,18 @@
                         </div>
                     </div>
                     
-                    <!-- Movie Dropdown -->
-                    <select name="movie_title" id="movie_title" style="width: 100%; max-width: 400px; padding: 12px; font-size: 14px; border: 2px solid #ddd; border-radius: 6px; margin-bottom: 15px;" required>
-                        <option value="" disabled {% if not movie_title %}selected{% endif %}>Choose a movie...</option>
+                    <!-- Movie Dropdown - FIXED VISIBILITY -->
+                    <select name="movie_title" id="movie_title" required
+                            style="width: 100% !important; max-width: 400px !important; padding: 12px !important; font-size: 14px !important; border: 2px solid #ddd !important; border-radius: 6px !important; margin-bottom: 15px !important; background-color: #ffffff !important; color: #2c3e50 !important; font-weight: 500 !important;">
+                        <option value="" disabled {% if not movie_title %}selected{% endif %}
+                                style="background-color: #f8f9fa !important; color: #6c757d !important; font-style: italic !important;">
+                            Choose a movie...
+                        </option>
                         {% for title in all_titles %}
-                            <option value="{{ title }}" {% if movie_title and title == movie_title %}selected{% endif %}>{{ title }}</option>
+                            <option value="{{ title }}" {% if movie_title and title == movie_title %}selected{% endif %}
+                                    style="background-color: #ffffff !important; color: #2c3e50 !important; padding: 8px 12px !important; font-size: 14px !important;">
+                                {{ title }}
+                            </option>
                         {% endfor %}
                     </select>
                     
@@ -181,16 +188,29 @@
                         <!-- Two-column form layout -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                             
-                            <!-- Helpfulness Rating -->
+                            <!-- Helpfulness Rating - FIXED DROPDOWN -->
                             <div>
                                 <label for="feedback" style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">
                                     How helpful was this visualization?
                                 </label>
-                                <select name="feedback" id="feedback" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;" required>
-                                    <option value="" disabled selected>Select your rating</option>
-                                    <option value="very_helpful">😊 Very Helpful - This really helped me understand!</option>
-                                    <option value="somewhat_helpful">😐 Somewhat Helpful - Useful but could be better</option>
-                                    <option value="not_helpful">😞 Not Helpful - Didn't help me much</option>
+                                <select name="feedback" id="feedback" required
+                                        style="width: 100% !important; padding: 12px !important; border: 2px solid #ddd !important; border-radius: 6px !important; font-size: 14px !important; background-color: #ffffff !important; color: #2c3e50 !important; font-weight: 500 !important;">
+                                    <option value="" disabled selected 
+                                            style="background-color: #f8f9fa !important; color: #6c757d !important; font-style: italic !important;">
+                                        Select your rating
+                                    </option>
+                                    <option value="very_helpful" 
+                                            style="background-color: #ffffff !important; color: #2c3e50 !important; padding: 8px !important; font-size: 14px !important;">
+                                        😊 Very Helpful - This really helped me understand!
+                                    </option>
+                                    <option value="somewhat_helpful" 
+                                            style="background-color: #ffffff !important; color: #2c3e50 !important; padding: 8px !important; font-size: 14px !important;">
+                                        😐 Somewhat Helpful - Useful but could be better
+                                    </option>
+                                    <option value="not_helpful" 
+                                            style="background-color: #ffffff !important; color: #2c3e50 !important; padding: 8px !important; font-size: 14px !important;">
+                                        😞 Not Helpful - Didn't help me much
+                                    </option>
                                 </select>
                             </div>
                             
@@ -300,6 +320,90 @@
     </div>
 
 </div>
+
+<!-- CRITICAL: CSS Fixes for Dropdown Visibility -->
+<style>
+/* Fix for dropdown text visibility issues */
+select#movie_title {
+    width: 100% !important; 
+    max-width: 400px !important; 
+    padding: 12px !important; 
+    font-size: 14px !important; 
+    border: 2px solid #ddd !important; 
+    border-radius: 6px !important; 
+    margin-bottom: 15px !important;
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    font-weight: 500 !important;
+}
+
+select#movie_title option {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+}
+
+select#movie_title option[disabled] {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    font-style: italic !important;
+}
+
+select#feedback {
+    width: 100% !important; 
+    padding: 12px !important; 
+    border: 2px solid #ddd !important; 
+    border-radius: 6px !important; 
+    font-size: 14px !important;
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    font-weight: 500 !important;
+}
+
+select#feedback option {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+}
+
+select#feedback option[disabled] {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    font-style: italic !important;
+}
+
+/* Dark mode override to ensure visibility */
+@media (prefers-color-scheme: dark) {
+    select#movie_title,
+    select#feedback {
+        background-color: #ffffff !important;
+        color: #2c3e50 !important;
+    }
+    
+    select#movie_title option,
+    select#feedback option {
+        background-color: #ffffff !important;
+        color: #2c3e50 !important;
+    }
+}
+
+/* Focus states for better UX */
+select#movie_title:focus,
+select#feedback:focus {
+    outline: none !important;
+    border-color: #4f7ecb !important;
+    box-shadow: 0 0 0 0.2rem rgba(79, 126, 203, 0.25) !important;
+}
+
+/* Hover states */
+select#movie_title:hover,
+select#feedback:hover {
+    border-color: #4f7ecb !important;
+}
+</style>
 {% endblock %}
 
 {% block script %}
@@ -614,4 +718,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-{% endblock %})
+{% endblock %}
